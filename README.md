@@ -1,3 +1,3 @@
 # Review Stats
 
-Scripts to produce stats concerning PR reviews on GitHub.
+Produce stats concerning PR reviews on GitHub.
