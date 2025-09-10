@@ -2,24 +2,9 @@
 
 import argparse
 import re
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import timedelta
 
-
-class Period:
-  def __init__(self, start: datetime, end: Optional[datetime] = None):
-    self.start = start
-    self.end = end or datetime.now(timezone.utc)
-
-  def __str__(self) -> str:
-    """Pretty print the time period"""
-    start_iso = self.isodatetime(self.start)
-    end_iso = self.isodatetime(self.end)
-    return f"Period from {start_iso} to {end_iso}"
-
-  @staticmethod
-  def isodatetime(dt: datetime) -> str:
-    return dt.isoformat(timespec='seconds').replace('+00:00', 'Z')
+from src.period import Period
 
 
 def parse_period(period_str):
