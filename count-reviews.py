@@ -3,18 +3,24 @@
 import argparse
 
 
-def main():
+def count_reviews(repo, users):
+  return {"repository": repo, "users": users}
+
+
+def parse_args():
   parser = argparse.ArgumentParser(description="Count reviews on a GitHub repository")
   parser.add_argument("repo", help="GitHub repository in format owner/repo")
-  parser.add_argument("--users", help="Comma-separated usernames to filter reviews for")
+  parser.add_argument(
+      "--users",
+      help="Comma-separated usernames to filter reviews for",
+      type=lambda s: tuple(u.strip() for u in s.split(",")),
+  )
 
-  args = parser.parse_args()
+  return parser.parse_args()
 
-  print(f"Repository: {args.repo}")
-  if args.users:
-    users_list = [user.strip() for user in args.users.split(",")]
-    print(f"User filter: {users_list}")
-
+def main():
+  args = parse_args()
+  print(count_reviews(args.repo, args.users))
 
 if __name__ == "__main__":
   main()
