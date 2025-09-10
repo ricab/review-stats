@@ -27,6 +27,8 @@ def parse_period(period_str):
   elif unit == 'm':
     return timedelta(days=value * 30)  # Approximate months as 30 days
 
+  assert False, "unreachable: accepted but unhandled unit"
+
 
 def parse_args():
   parser = argparse.ArgumentParser(description="Count reviews on a GitHub repository")
