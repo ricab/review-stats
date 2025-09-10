@@ -5,6 +5,7 @@ import re
 from datetime import timedelta
 
 from src.period import Period
+from src.review_inspector import count_reviews
 
 
 def parse_period(period_str):
@@ -25,10 +26,6 @@ def parse_period(period_str):
     return timedelta(weeks=value)
   elif unit == 'm':
     return timedelta(days=value * 30)  # Approximate months as 30 days
-
-
-def count_reviews(repo, users, period):
-  return {"repository": repo, "users": users, "period": period}
 
 
 def parse_args():
