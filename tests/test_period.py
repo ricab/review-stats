@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timezone, timedelta
 from src.period import Period
 
@@ -38,6 +39,21 @@ class TestPeriod(unittest.TestCase):
         dt = datetime(2001, 2, 3, 4, 5, 6, tzinfo=tz_offset)
         result = Period.isodatetime(dt)
         self.assertEqual(result, "2001-02-03T04:05:06+05:00")
+
+    @patch('src.period.datetime')
+    def test_from_duration(self, mock_datetime):
+        mock_now = datetime(2024, 2, 15, 10, 30, 14, tzinfo=timezone.utc)
+        mock_datetime.now.return_value = mock_now
+
+        duration = timedelta(days=7)
+        period = Period.from_duration(duration)
+
+        expected_start = datetime(2024, 2, 8, 10, 30, 14, tzinfo=timezone.utc)
+        expected_end = mock_now
+
+        self.assertEqual(period.start, expected_start)
+        self.assertEqual(period.end, expected_end)
+        mock_datetime.now.assert_called_once_with(timezone.utc)
 
 if __name__ == '__main__':
     unittest.main()

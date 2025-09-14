@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 
@@ -6,6 +6,12 @@ class Period:
   def __init__(self, start: datetime, end: Optional[datetime] = None):
     self.start = start
     self.end = end or datetime.now(timezone.utc)
+
+  @classmethod
+  def from_duration(cls, duration: timedelta) -> 'Period':
+    """Create a period spanning from now back by duration (e.g., last 2 weeks)"""
+    now = datetime.now(timezone.utc)
+    return cls(now - duration, now)
 
   @staticmethod
   def isodatetime(dt: datetime) -> str:
