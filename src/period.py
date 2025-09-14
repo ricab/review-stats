@@ -22,3 +22,7 @@ class Period:
     start_iso = self.isodatetime(self.start)
     end_iso = self.isodatetime(self.end)
     return f"Period from {start_iso} to {end_iso}"
+
+  def contains(self, timestamp: datetime) -> bool:
+    """Check if the timestamp falls within this period"""
+    return self.start <= timestamp <= self.end
