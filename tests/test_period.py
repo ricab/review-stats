@@ -56,5 +56,38 @@ class TestPeriod(unittest.TestCase):
     self.assertEqual(period.end, expected_end)
     mock_datetime.now.assert_called_once_with(timezone.utc)
 
+  @patch('src.period.datetime')
+  def test_contains(self, mock_datetime):
+    mock_datetime.now.return_value = self.end_time
+    periods = [
+      Period(self.start_time),
+      Period(self.start_time, self.end_time),
+      Period.from_duration(self.delta),
+    ]
+
+    base_cases = [
+      # (timestamp, expected_result, description)
+      (datetime(2024, 1, 15, 12, 0, 0, tzinfo=timezone.utc), True, "within period"),
+      (datetime(2023, 12, 31, 12, 0, 0, tzinfo=timezone.utc), False, "before period"),
+      (datetime(2024, 2, 1, 12, 0, 0, tzinfo=timezone.utc), False, "after period"),
+      (self.start_time, True, "at start boundary"),
+      (self.end_time, True, "at end boundary"),
+      # Different timezone - same UTC time as 2024-01-15 12:00:00 UTC
+      (datetime(2024, 1, 15, 17, 0, 0, tzinfo=timezone(timedelta(hours=5))), True,
+       "different timezone within"),
+      # Different timezone - before period
+      (datetime(2023, 12, 31, 18, 0, 0, tzinfo=timezone(timedelta(hours=6))), False,
+       "different timezone before"),
+    ]
+
+    test_cases = [(period, timestamp, result, description) for period in periods for
+                  timestamp, result, description in base_cases]
+
+    for period, timestamp, expected, description in test_cases:
+      with self.subTest(description=description):
+        result = period.contains(timestamp)
+        self.assertEqual(result, expected)
+
+
 if __name__ == '__main__':
   unittest.main()
