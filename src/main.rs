@@ -10,8 +10,8 @@ struct Args {
     repo: String,
 
     /// Comma-separated usernames to filter reviews for
-    #[arg(long)]
-    users: Option<String>,
+    #[arg(long, value_delimiter = ',')]
+    users: Option<Vec<String>>,
 }
 
 fn main() {
@@ -19,6 +19,6 @@ fn main() {
     println!("Repository: {}", args.repo);
 
     if let Some(users) = args.users {
-        println!("Users: {}", users);
+        println!("Users: {}", users.join(" "));
     }
 }
