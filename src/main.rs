@@ -8,9 +8,17 @@ use clap::Parser;
 struct Args {
     /// GitHub repository in format owner/repo
     repo: String,
+
+    /// Comma-separated usernames to filter reviews for
+    #[arg(long)]
+    users: Option<String>,
 }
 
 fn main() {
     let args = Args::parse();
     println!("Repository: {}", args.repo);
+
+    if let Some(users) = args.users {
+        println!("Users: {}", users);
+    }
 }
