@@ -17,6 +17,10 @@ impl Timeframe {
     pub fn end(&self) -> DateTime<Utc> {
         self.end
     }
+
+    pub fn is_inside(&self, timestamp: DateTime<Utc>) -> bool {
+        self.start <= timestamp && timestamp <= self.end
+    }
 }
 
 #[cfg(test)]
@@ -32,5 +36,15 @@ mod test {
 
         assert_eq!(uut.start(), begin);
         assert_eq!(uut.end(), finish);
+    }
+
+    #[test]
+    fn recognizes_timestamp_inside() {
+        let begin = Utc.timestamp_opt(111, 0).unwrap();
+        let finish = Utc.timestamp_opt(333, 0).unwrap();
+        let inside = Utc.timestamp_opt(222, 0).unwrap();
+
+        let uut = Timeframe::new(begin, finish);
+        assert!(uut.is_inside(inside));
     }
 }
