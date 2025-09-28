@@ -5,6 +5,10 @@ use clap::Parser;
     author = "Ricardo Abreu, ricab@ricabhome.org",
     about = "Count reviews on a GitHub repository",
     arg_required_else_help = true,
+    after_help = "Examples:
+  count-reviews octocat/Hello-World
+  count-reviews --users alice,bob microsoft/vscode
+  count-reviews --period 2w canonical/multipass"
 )]
 struct Args {
     /// GitHub repository in format owner/repo
