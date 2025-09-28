@@ -17,6 +17,10 @@ struct Args {
     /// Comma-separated usernames to filter reviews for
     #[arg(long, value_delimiter = ',')]
     users: Option<Vec<String>>,
+
+    /// Time period to analyze (e.g., 10d, 2w, 3m, 24h)
+    #[arg(long)]
+    period: Option<String>,
 }
 
 fn main() {
@@ -25,5 +29,9 @@ fn main() {
 
     if let Some(users) = args.users {
         println!("Users: {}", users.join(" "));
+    }
+
+    if let Some(period) = args.period {
+        println!("Period: {}", period);
     }
 }
