@@ -16,7 +16,7 @@ struct Args {
 
     /// Comma-separated reviewer usernames to count reviews for (e.g. alice,bob)
     #[arg(long, value_delimiter = ',')]
-    users: Option<Vec<String>>,
+    reviewers: Option<Vec<String>>,
 
     /// Time period to analyze (e.g., 10d, 2w, 3m, 24h)
     #[arg(long)]
@@ -27,8 +27,8 @@ fn main() {
     let args = Args::parse();
     println!("Repository: {}", args.repo);
 
-    if let Some(users) = args.users {
-        println!("Users: {}", users.join(" "));
+    if let Some(reviewers) = args.reviewers {
+        println!("Users: {}", reviewers.join(" "));
     }
 
     if let Some(period) = args.period {
