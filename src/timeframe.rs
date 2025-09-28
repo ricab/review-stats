@@ -11,14 +11,18 @@ impl Timeframe {
         Self { start, end }
     }
 
-    pub fn start(&self) -> DateTime<Utc> { self.start }
-    pub fn end(&self) -> DateTime<Utc> { self.end }
+    pub fn start(&self) -> DateTime<Utc> {
+        self.start
+    }
+    pub fn end(&self) -> DateTime<Utc> {
+        self.end
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use chrono::{TimeZone, Utc};
     use crate::timeframe::Timeframe;
+    use chrono::{TimeZone, Utc};
 
     #[test]
     fn accessors_behave() {
