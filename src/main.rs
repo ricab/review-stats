@@ -14,7 +14,7 @@ struct Args {
     /// GitHub repository in format owner/repo
     repo: String,
 
-    /// Comma-separated usernames to filter reviews for
+    /// Comma-separated reviewer usernames to count reviews for (e.g. alice,bob)
     #[arg(long, value_delimiter = ',')]
     users: Option<Vec<String>>,
 
