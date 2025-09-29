@@ -1,1 +1,3 @@
-.idea
+# JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, etc.)
+.idea/
+.idea_modules/
