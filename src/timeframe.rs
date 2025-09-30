@@ -26,7 +26,7 @@ impl Timeframe {
 #[cfg(test)]
 mod test {
     use crate::timeframe::Timeframe;
-    use chrono::{TimeZone, Utc};
+    use chrono::{DateTime, TimeZone, Utc};
 
     #[test]
     fn accessors_behave() {
@@ -39,12 +39,58 @@ mod test {
     }
 
     #[test]
-    fn recognizes_timestamp_inside() {
-        let begin = Utc.timestamp_opt(111, 0).unwrap();
-        let finish = Utc.timestamp_opt(333, 0).unwrap();
-        let inside = Utc.timestamp_opt(222, 0).unwrap();
+    fn recognizes_timestamp_inside_outside() {
+        let cases1 = [
+            (111, 333, 222, true),
+            (111, 333, 333, true),
+            (111, 333, 111, true),
+            (111, 333, 112, true),
+            (111, 333, 110, false),
+            (111, 333, 334, false),
+            (111, 222, 333, false),
+        ];
+        let cases2 = [
+            (
+                (2025, 9, 20, 23, 59, 59),
+                (2025, 9, 30, 0, 0, 0),
+                (2025, 9, 30, 12, 0, 0),
+                false,
+            ),
+            (
+                (2025, 9, 20, 23, 59, 59),
+                (2025, 9, 30, 0, 0, 0),
+                (2025, 9, 25, 12, 0, 0),
+                true,
+            ),
+            (
+                (2025, 9, 20, 23, 59, 59),
+                (2025, 9, 30, 0, 0, 0),
+                (2025, 9, 25, 1, 2, 3),
+                true,
+            ),
+        ];
 
-        let uut = Timeframe::new(begin, finish);
-        assert!(uut.is_inside(inside));
+        fn i_to_ts(i: i64) -> DateTime<Utc> {
+            Utc.timestamp_opt(i, 0).unwrap()
+        }
+
+        fn tup_to_ts(tup: (i32, u32, u32, u32, u32, u32)) -> DateTime<Utc> {
+            let (y, m, d, h, min, s) = tup;
+            Utc.with_ymd_and_hms(y, m, d, h, min, s).unwrap()
+        }
+
+        for case in cases1 {
+            let (begin, finish, other, expect_inside) = case; // TODO@ricab begin end v start finish
+            let uut = Timeframe::new(i_to_ts(begin), i_to_ts(finish));
+
+            assert_eq!(uut.is_inside(i_to_ts(other)), expect_inside);
+        }
+
+        for case in cases2 {
+            let (begin, finish, other, expect_inside) = case;
+            let uut = Timeframe::new(tup_to_ts(begin), tup_to_ts(finish));
+
+            assert_eq!(uut.is_inside(tup_to_ts(other)), expect_inside);
+        }
     }
 }
