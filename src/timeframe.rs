@@ -2,24 +2,24 @@ use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone)]
 pub struct Timeframe {
-    start: DateTime<Utc>,
+    begin: DateTime<Utc>,
     end: DateTime<Utc>,
 }
 
 impl Timeframe {
-    pub fn new(start: DateTime<Utc>, end: DateTime<Utc>) -> Self {
-        Self { start, end }
+    pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Self {
+        Self { begin, end }
     }
 
-    pub fn start(&self) -> DateTime<Utc> {
-        self.start
+    pub fn begin(&self) -> DateTime<Utc> {
+        self.begin
     }
     pub fn end(&self) -> DateTime<Utc> {
         self.end
     }
 
     pub fn is_inside(&self, timestamp: DateTime<Utc>) -> bool {
-        self.start <= timestamp && timestamp <= self.end
+        self.begin <= timestamp && timestamp <= self.end
     }
 }
 
@@ -30,11 +30,11 @@ mod test {
 
     #[test]
     fn accessors_behave() {
-        let begin = Utc.timestamp_opt(1234567890, 321).unwrap();
+        let start = Utc.timestamp_opt(1234567890, 321).unwrap();
         let finish = Utc.timestamp_opt(9876543210, 123).unwrap();
-        let uut = Timeframe::new(begin, finish);
+        let uut = Timeframe::new(start, finish);
 
-        assert_eq!(uut.start(), begin);
+        assert_eq!(uut.begin(), start);
         assert_eq!(uut.end(), finish);
     }
 
@@ -81,8 +81,8 @@ mod test {
 
         fn test_case<T, F>(cases: &[(T, T, T, bool)], converter: F)
         where F: Fn(&T) -> DateTime<Utc> {
-            for (begin, finish, other, expect_inside) in cases {
-                let uut = Timeframe::new(converter(begin), converter(finish));
+            for (start, finish, other, expect_inside) in cases {
+                let uut = Timeframe::new(converter(start), converter(finish));
                 assert_eq!(uut.is_inside(converter(other)), *expect_inside);
             }
         }
