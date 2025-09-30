@@ -70,27 +70,27 @@ mod test {
             ),
         ];
 
-        fn i_to_ts(i: i64) -> DateTime<Utc> {
-            Utc.timestamp_opt(i, 0).unwrap()
+        fn i_to_ts(i: &i64) -> DateTime<Utc> {
+            Utc.timestamp_opt(*i, 0).unwrap()
         }
 
-        fn tup_to_ts(tup: (i32, u32, u32, u32, u32, u32)) -> DateTime<Utc> {
-            let (y, m, d, h, min, s) = tup;
+        fn tup_to_ts(tup: &(i32, u32, u32, u32, u32, u32)) -> DateTime<Utc> {
+            let (y, m, d, h, min, s) = *tup;
             Utc.with_ymd_and_hms(y, m, d, h, min, s).unwrap()
         }
 
         for case in cases1 {
             let (begin, finish, other, expect_inside) = case; // TODO@ricab begin end v start finish
-            let uut = Timeframe::new(i_to_ts(begin), i_to_ts(finish));
+            let uut = Timeframe::new(i_to_ts(&begin), i_to_ts(&finish));
 
-            assert_eq!(uut.is_inside(i_to_ts(other)), expect_inside);
+            assert_eq!(uut.is_inside(i_to_ts(&other)), expect_inside);
         }
 
         for case in cases2 {
             let (begin, finish, other, expect_inside) = case;
-            let uut = Timeframe::new(tup_to_ts(begin), tup_to_ts(finish));
+            let uut = Timeframe::new(tup_to_ts(&begin), tup_to_ts(&finish));
 
-            assert_eq!(uut.is_inside(tup_to_ts(other)), expect_inside);
+            assert_eq!(uut.is_inside(tup_to_ts(&other)), expect_inside);
         }
     }
 }
