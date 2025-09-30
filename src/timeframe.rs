@@ -79,18 +79,15 @@ mod test {
             Utc.with_ymd_and_hms(y, m, d, h, min, s).unwrap()
         }
 
-        for case in cases1 {
-            let (begin, finish, other, expect_inside) = case; // TODO@ricab begin end v start finish
-            let uut = Timeframe::new(i_to_ts(&begin), i_to_ts(&finish));
-
-            assert_eq!(uut.is_inside(i_to_ts(&other)), expect_inside);
+        fn test_case<T, F>(cases: &[(T, T, T, bool)], converter: F)
+        where F: Fn(&T) -> DateTime<Utc> {
+            for (begin, finish, other, expect_inside) in cases {
+                let uut = Timeframe::new(converter(begin), converter(finish));
+                assert_eq!(uut.is_inside(converter(other)), *expect_inside);
+            }
         }
 
-        for case in cases2 {
-            let (begin, finish, other, expect_inside) = case;
-            let uut = Timeframe::new(tup_to_ts(&begin), tup_to_ts(&finish));
-
-            assert_eq!(uut.is_inside(tup_to_ts(&other)), expect_inside);
-        }
+        test_case(&cases1, i_to_ts);
+        test_case(&cases2, tup_to_ts);
     }
 }
