@@ -7,7 +7,7 @@ use clap::Parser;
     arg_required_else_help = true,
     after_help = "Examples:
   count-reviews octocat/Hello-World
-  count-reviews --users alice,bob microsoft/vscode
+  count-reviews --reviewers alice,bob microsoft/vscode
   count-reviews --period 2w canonical/multipass"
 )]
 struct Args {
