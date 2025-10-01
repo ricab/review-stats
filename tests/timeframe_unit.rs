@@ -75,7 +75,7 @@ fn recognizes_timestamp_inside_outside() {
 fn constructs_from_timedelta() {
     let delta = TimeDelta::days(123);
     let before = Utc::now();
-    let uut = Timeframe::from_timedelta(delta);
+    let uut = Timeframe::from_delta(delta);
     let after = Utc::now();
 
     assert_eq!(uut.end() - uut.begin(), delta);

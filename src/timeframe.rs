@@ -11,7 +11,7 @@ impl Timeframe {
         Self { begin, end }
     }
 
-    pub fn from_timedelta(delta: TimeDelta) -> Self {
+    pub fn from_delta(delta: TimeDelta) -> Self {
         let now = Utc::now();
         Self {
             begin: now - delta,
