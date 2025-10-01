@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeDelta, Utc};
 
 #[derive(Debug)]
 pub struct Timeframe {
@@ -9,6 +9,14 @@ pub struct Timeframe {
 impl Timeframe {
     pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Self {
         Self { begin, end }
+    }
+
+    pub fn from_timedelta(delta: TimeDelta) -> Self {
+        let now = Utc::now();
+        Self {
+            begin: now - delta,
+            end: now,
+        }
     }
 
     pub fn begin(&self) -> DateTime<Utc> {
@@ -26,7 +34,7 @@ impl Timeframe {
 #[cfg(test)]
 mod test {
     use crate::timeframe::Timeframe;
-    use chrono::{DateTime, TimeZone, Utc};
+    use chrono::{DateTime, TimeZone, Utc, TimeDelta};
 
     #[test]
     fn accessors_behave() {
@@ -89,5 +97,16 @@ mod test {
 
         test_case(&cases1, i_to_ts);
         test_case(&cases2, tup_to_ts);
+    }
+
+    #[test]
+    fn constructs_from_timedelta() {
+        let delta = TimeDelta::days(123);
+        let before = Utc::now();
+        let uut = Timeframe::from_timedelta(delta);
+        let after = Utc::now();
+
+        assert_eq!(uut.end() - uut.begin(), delta);
+        assert!(before <= uut.end() && after >= uut.end());
     }
 }
