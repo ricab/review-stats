@@ -6,6 +6,7 @@ pub struct Timeframe {
     end: DateTime<Utc>,
 }
 
+/// An absolute window of earth time with inclusive boundaries
 impl Timeframe {
     pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Self {
         Self { begin, end }
