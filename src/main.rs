@@ -1,7 +1,5 @@
 use clap::Parser;
 
-mod timeframe;
-
 #[derive(Parser)]
 #[command(
     author = "Ricardo Abreu, ricab@ricabhome.org",
