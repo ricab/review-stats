@@ -122,22 +122,36 @@ fn refuses_bad_units() {
         "", " ", "\t", "    ", " \t ", " d ", " up", "+", "=", "x", "9", "asdf", "hdw", "🤪",
     ];
 
-    fn test_case(num: i64, unit: &str) {
-        let uut: review_stats::Result<Timeframe> = num_unit_to_timeframe(num, unit);
-        assert!(uut.is_err_and(|error| error
-            .to_string()
-            .to_lowercase()
-            .contains("invalid timeframe format")));
-    }
-
     for num in nums {
         for unit in units {
-            test_case(num, unit);
+            assert_invalid_format_error(num_unit_to_timeframe(num, unit));
         }
     }
 }
 
-fn num_unit_to_timeframe(num: i64, unit: impl Display) -> review_stats::Result<Timeframe> {
+#[test]
+fn refuses_bad_numbers() {
+    let nums = ["-1", "1.2", "0.1", "0x3ab", "a", ""];
+    let units = ["h", "d", "w", "m"];
+
+    for num in nums {
+        for unit in units {
+            assert_invalid_format_error(num_unit_to_timeframe(num, unit));
+        }
+    }
+}
+
+// Helpers
+
+fn assert_invalid_format_error(result: review_stats::Result<Timeframe>) {
+    // TODO@ricab import result
+    assert!(result.is_err_and(|error| error
+        .to_string()
+        .to_lowercase()
+        .contains("invalid timeframe format")));
+}
+
+fn num_unit_to_timeframe(num: impl Display, unit: impl Display) -> review_stats::Result<Timeframe> {
     format!("{}{}", num, unit).parse()
 }
 
