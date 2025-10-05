@@ -4,7 +4,9 @@ use chrono::{DateTime, TimeDelta, Utc};
 
 use regex::Regex;
 use std::str::FromStr;
+use std::sync::LazyLock;
 
+/// An absolute window of earth time with inclusive boundaries
 #[derive(Debug)]
 pub struct Timeframe {
     // TODO@ricab enforce invariant end >= begin
@@ -12,10 +14,9 @@ pub struct Timeframe {
     end: DateTime<Utc>,
 }
 
-/// An absolute window of earth time with inclusive boundaries
+// Custom public interface
 impl Timeframe {
     pub const MONTH_DAYS: i64 = 30;
-    const PATTERN: &'static str = r"^(\d+)([hdwm])$";
 
     pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Self {
         Self { begin, end }
@@ -44,7 +45,7 @@ impl Timeframe {
 impl FromStr for Timeframe {
     type Err = BoxedError;
     fn from_str(s: &str) -> Result<Self> {
-        let re = Regex::new(Self::PATTERN).unwrap(); // TODO@ricab make this compile time
+        let re = Timeframe::ready_regex();
 
         let emsg = "Invalid timeframe format (expected '<number><unit>', e.g., '10d', '2w')";
         let captures = re.captures(s).ok_or(emsg)?;
@@ -63,5 +64,14 @@ impl FromStr for Timeframe {
         };
 
         Ok(Timeframe::from_delta(creator?(num?)))
+    }
+}
+
+// private helpers
+impl Timeframe {
+    fn ready_regex() -> &'static Regex {
+        static PATTERN: &'static str = r"^(\d+)([hdwm])$";
+        static REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+        &REGEX
     }
 }
