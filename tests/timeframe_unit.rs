@@ -74,10 +74,24 @@ fn recognizes_timestamp_inside_outside() {
 #[test]
 fn constructs_from_timedelta() {
     let delta = TimeDelta::days(123);
+
     let before = Utc::now();
     let uut = Timeframe::from_delta(delta);
     let after = Utc::now();
 
     assert_eq!(uut.end() - uut.begin(), delta);
     assert!(before <= uut.end() && after >= uut.end());
+}
+
+#[test]
+fn constructs_from_days_string() {
+    let days = 182; // TODO@ricab add consts?
+    let expect_delta = TimeDelta::days(days);
+
+    let before = Utc::now();
+    let uut: Timeframe = format!("{}d", days).parse().unwrap();
+    let after = Utc::now();
+
+    assert_eq!(uut.end() - uut.begin(), expect_delta);
+    assert!(before <= uut.end() && after >= uut.end()); // TODO@ricab extract this
 }
