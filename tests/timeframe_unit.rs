@@ -84,14 +84,32 @@ fn constructs_from_timedelta() {
 }
 
 #[test]
-fn constructs_from_days_string() {
-    let days = 182; // TODO@ricab add consts?
-    let expect_delta = TimeDelta::days(days);
+fn constructs_from_string() {
+    let nums = [0, 1, 12, 123, 1234];
+    let units = ['h', 'd', 'w', 'm'];
 
-    let before = Utc::now();
-    let uut: Timeframe = format!("{}d", days).parse().unwrap();
-    let after = Utc::now();
+    fn calc_delta(num: i64, unit: char) -> TimeDelta {
+        match unit {
+            'h' => TimeDelta::hours(num),
+            'd' => TimeDelta::days(num),
+            'w' => TimeDelta::weeks(num),
+            'm' => TimeDelta::days(num * Timeframe::MONTH_DAYS),
+            _ => panic!("Unknown unit"),
+        }
+    }
 
-    assert_eq!(uut.end() - uut.begin(), expect_delta);
-    assert!(before <= uut.end() && after >= uut.end()); // TODO@ricab extract this
+    fn test_case(num: i64, unit: char) {
+        let before = Utc::now();
+        let uut: Timeframe = format!("{}{}", num, unit).parse().unwrap();
+        let after = Utc::now();
+
+        assert_eq!(uut.end() - uut.begin(), calc_delta(num, unit));
+        assert!(before <= uut.end() && after >= uut.end()); // TODO@ricab extract this
+    }
+
+    for num in nums {
+        for unit in units {
+            test_case(num, unit);
+        }
+    }
 }
