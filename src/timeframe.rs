@@ -43,7 +43,9 @@ impl Timeframe {
 impl FromStr for Timeframe {
     type Err = BoxedError;
     fn from_str(s: &str) -> Result<Self> {
+        const MONTH_DAYS: i64 = 30; // TODO@ricab move to struct level
         let re = Regex::new(Self::PATTERN).unwrap(); // TODO@ricab make this compile time
+
         let captures = re
             .captures(s)
             .ok_or("Invalid timeframe format (expected '<number><unit>', e.g., '10d', '2w')")?;
@@ -54,7 +56,7 @@ impl FromStr for Timeframe {
             "h" => Ok(TimeDelta::hours),
             "d" => Ok(TimeDelta::days),
             "w" => Ok(TimeDelta::weeks),
-            // "m" => TimeDelta::, // TODO@ricab
+            "m" => Ok(|unit| TimeDelta::days(unit * MONTH_DAYS)),
             _ => {
                 let msg = format!("Unknown time unit '{}'", unit);
                 Err((msg + " (expected: one of 'h', 'd', 'w', or 'm')").into())
