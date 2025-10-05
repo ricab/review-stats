@@ -46,9 +46,8 @@ impl FromStr for Timeframe {
     fn from_str(s: &str) -> Result<Self> {
         let re = Regex::new(Self::PATTERN).unwrap(); // TODO@ricab make this compile time
 
-        let captures = re
-            .captures(s)
-            .ok_or("Invalid timeframe format (expected '<number><unit>', e.g., '10d', '2w')")?;
+        let emsg = "Invalid timeframe format (expected '<number><unit>', e.g., '10d', '2w')";
+        let captures = re.captures(s).ok_or(emsg)?;
         let (value, unit) = (&captures[1], &captures[2]); // index 0 is the entire match
         let num = value.parse();
 
@@ -58,8 +57,8 @@ impl FromStr for Timeframe {
             "w" => Ok(TimeDelta::weeks),
             "m" => Ok(|unit| TimeDelta::days(unit * Self::MONTH_DAYS)),
             _ => {
-                let msg = format!("Unknown time unit '{}'", unit);
-                Err((msg + " (expected: one of 'h', 'd', 'w', or 'm')").into())
+                let emsg = format!("Unknown time unit '{}'", unit);
+                Err((emsg + " (expected: one of 'h', 'd', 'w', or 'm')").into())
             }
         };
 
