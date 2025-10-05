@@ -3,6 +3,7 @@
 // Enforce testing public interface only, to prevent brittleness
 
 use review_stats::timeframe::Timeframe;
+use std::fmt::Display;
 
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 
@@ -100,7 +101,7 @@ fn constructs_from_string() {
 
     fn test_case(num: i64, unit: char) {
         let before = Utc::now();
-        let uut: Timeframe = format!("{}{}", num, unit).parse().unwrap();
+        let uut: Timeframe = num_unit_to_timeframe(num, unit).unwrap();
         let after = Utc::now();
 
         assert_eq!(uut.end() - uut.begin(), calc_delta(num, unit));
@@ -112,6 +113,32 @@ fn constructs_from_string() {
             test_case(num, unit);
         }
     }
+}
+
+#[test]
+fn refuses_bad_units() {
+    let nums = [0, 1, 21, 321, 4321];
+    let units = [
+        "", " ", "\t", "    ", " \t ", " d ", " up", "+", "=", "x", "9", "asdf", "hdw", "🤪",
+    ];
+
+    fn test_case(num: i64, unit: &str) {
+        let uut: review_stats::Result<Timeframe> = num_unit_to_timeframe(num, unit);
+        assert!(uut.is_err_and(|error| error
+            .to_string()
+            .to_lowercase()
+            .contains("invalid timeframe format")));
+    }
+
+    for num in nums {
+        for unit in units {
+            test_case(num, unit);
+        }
+    }
+}
+
+fn num_unit_to_timeframe(num: i64, unit: impl Display) -> review_stats::Result<Timeframe> {
+    format!("{}{}", num, unit).parse()
 }
 
 fn within(before: DateTime<Utc>, after: DateTime<Utc>, uut: Timeframe) {
