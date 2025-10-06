@@ -2,7 +2,7 @@
 // Located here to prevent access to private fields
 // Enforce testing public interface only, to prevent brittleness
 
-use review_stats::timeframe::Timeframe;
+use review_stats::{timeframe::Timeframe, Result};
 use std::fmt::Display;
 
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
@@ -117,7 +117,7 @@ fn constructs_from_string() {
 
 #[test]
 fn refuses_empty_string() {
-    let uut: review_stats::Result<Timeframe> = "".parse();
+    let uut: Result<Timeframe> = "".parse();
     assert_invalid_format_error(uut);
 }
 
@@ -149,15 +149,14 @@ fn refuses_bad_numbers() {
 
 // Helpers
 
-fn assert_invalid_format_error(result: review_stats::Result<Timeframe>) {
-    // TODO@ricab import result
+fn assert_invalid_format_error(result: Result<Timeframe>) {
     assert!(result.is_err_and(|error| error
         .to_string()
         .to_lowercase()
         .contains("invalid timeframe format")));
 }
 
-fn num_unit_to_timeframe(num: impl Display, unit: impl Display) -> review_stats::Result<Timeframe> {
+fn num_unit_to_timeframe(num: impl Display, unit: impl Display) -> Result<Timeframe> {
     format!("{}{}", num, unit).parse()
 }
 
