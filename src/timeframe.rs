@@ -6,10 +6,9 @@ use regex::Regex;
 use std::str::FromStr;
 use std::sync::LazyLock;
 
-/// An absolute window of earth time with inclusive boundaries
+/// An absolute window of forward earth time with inclusive boundaries
 #[derive(Debug)]
 pub struct Timeframe {
-    // TODO@ricab enforce invariant end >= begin
     begin: DateTime<Utc>,
     end: DateTime<Utc>,
 }
@@ -18,11 +17,16 @@ pub struct Timeframe {
 impl Timeframe {
     pub const MONTH_DAYS: i64 = 30;
 
-    pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Self {
-        Self { begin, end }
+    pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Result<Self> {
+        if end < begin {
+            Err("Timeframes must not end before they begin".into())
+        } else {
+            Ok(Self { begin, end })
+        }
     }
 
     pub fn from_delta(delta: TimeDelta) -> Self {
+        // TODO@ricab enforce invariant end >= begin
         let now = Utc::now();
         Self {
             begin: now - delta,

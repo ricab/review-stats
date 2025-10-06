@@ -11,10 +11,21 @@ use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 fn accessors_behave() {
     let start = Utc.timestamp_opt(1234567890, 321).unwrap();
     let finish = Utc.timestamp_opt(9876543210, 123).unwrap();
-    let uut = Timeframe::new(start, finish);
+    let uut = Timeframe::new(start, finish).unwrap();
 
     assert_eq!(uut.begin(), start);
     assert_eq!(uut.end(), finish);
+}
+
+#[test]
+fn refuses_reverse_begin_end() {
+    let finish = Utc.timestamp_opt(1234567890, 321).unwrap();
+    let start = Utc.timestamp_opt(9876543210, 123).unwrap();
+    let uut = Timeframe::new(start, finish);
+
+    assert!(uut.is_err_and(|e| e
+        .to_string()
+        .contains("Timeframes must not end before they begin")));
 }
 
 #[test]
@@ -63,7 +74,7 @@ fn recognizes_timestamp_inside_outside() {
         F: Fn(&T) -> DateTime<Utc>,
     {
         for (start, finish, other, expect_inside) in cases {
-            let uut = Timeframe::new(converter(start), converter(finish));
+            let uut = Timeframe::new(converter(start), converter(finish)).unwrap();
             assert_eq!(uut.is_inside(converter(other)), *expect_inside);
         }
     }
