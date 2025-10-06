@@ -116,6 +116,12 @@ fn constructs_from_string() {
 }
 
 #[test]
+fn refuses_empty_string() {
+    let uut: review_stats::Result<Timeframe> = "".parse();
+    assert_invalid_format_error(uut);
+}
+
+#[test]
 fn refuses_bad_units() {
     let nums = [0, 1, 21, 321, 4321];
     let units = [
