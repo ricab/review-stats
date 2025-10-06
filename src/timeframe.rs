@@ -57,10 +57,7 @@ impl FromStr for Timeframe {
             "d" => Ok(TimeDelta::days),
             "w" => Ok(TimeDelta::weeks),
             "m" => Ok(|unit| TimeDelta::days(unit * Self::MONTH_DAYS)),
-            _ => {
-                let emsg = format!("Unknown time unit '{}'", unit);
-                Err((emsg + " (expected: one of 'h', 'd', 'w', or 'm')").into())
-            }
+            _ => unreachable!("Unknown unit '{}' shouldn't match regex", unit),
         };
 
         Ok(Timeframe::from_delta(creator?(num?)))
