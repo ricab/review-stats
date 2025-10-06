@@ -80,7 +80,7 @@ fn constructs_from_timedelta() {
     let after = Utc::now();
 
     assert_eq!(uut.end() - uut.begin(), delta);
-    assert!(before <= uut.end() && after >= uut.end());
+    within(before, after, uut);
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn constructs_from_string() {
         let after = Utc::now();
 
         assert_eq!(uut.end() - uut.begin(), calc_delta(num, unit));
-        assert!(before <= uut.end() && after >= uut.end()); // TODO@ricab extract this
+        within(before, after, uut);
     }
 
     for num in nums {
@@ -112,4 +112,8 @@ fn constructs_from_string() {
             test_case(num, unit);
         }
     }
+}
+
+fn within(before: DateTime<Utc>, after: DateTime<Utc>, uut: Timeframe) {
+    assert!(before <= uut.end() && after >= uut.end());
 }
