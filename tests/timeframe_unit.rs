@@ -88,11 +88,21 @@ fn constructs_from_timedelta() {
     let delta = TimeDelta::days(123);
 
     let before = Utc::now();
-    let uut = Timeframe::from_delta(delta);
+    let uut = Timeframe::from_delta(delta).unwrap();
     let after = Utc::now();
 
     assert_eq!(uut.end() - uut.begin(), delta);
     within(before, after, uut);
+}
+
+#[test]
+fn refuses_negative_timedelta() {
+    let delta = TimeDelta::days(-123);
+    let uut = Timeframe::from_delta(delta);
+
+    assert!(uut.is_err_and(|e| e
+        .to_string()
+        .contains("Timeframes must not end before they begin")));
 }
 
 #[test]

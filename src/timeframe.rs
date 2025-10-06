@@ -25,12 +25,15 @@ impl Timeframe {
         }
     }
 
-    pub fn from_delta(delta: TimeDelta) -> Self {
-        // TODO@ricab enforce invariant end >= begin
-        let now = Utc::now();
-        Self {
-            begin: now - delta,
-            end: now,
+    pub fn from_delta(delta: TimeDelta) -> Result<Self> {
+        if delta < TimeDelta::zero() {
+            Err("Timeframes must not end before they begin".into())
+        } else {
+            let now = Utc::now();
+            Ok(Self {
+                begin: now - delta,
+                end: now,
+            })
         }
     }
 
@@ -54,7 +57,6 @@ impl FromStr for Timeframe {
         let emsg = "Invalid timeframe format (expected '<number><unit>', e.g., '10d', '2w')";
         let captures = re.captures(s).ok_or(emsg)?;
         let (value, unit) = (&captures[1], &captures[2]); // index 0 is the entire match
-        let num = value.parse();
 
         let creator: Result<fn(i64) -> TimeDelta> = match unit {
             "h" => Ok(TimeDelta::hours),
@@ -64,7 +66,13 @@ impl FromStr for Timeframe {
             _ => unreachable!("Unknown unit '{}' shouldn't match regex", unit),
         };
 
-        Ok(Timeframe::from_delta(creator?(num?)))
+        let num = value.parse()?;
+        let delta = creator?(num);
+        if delta < TimeDelta::zero() {
+            unreachable!("Negative value '{}' shouldn't match regex", num);
+        }
+
+        Ok(Timeframe::from_delta(delta).expect("The delta should be valid at this point"))
     }
 }
 
