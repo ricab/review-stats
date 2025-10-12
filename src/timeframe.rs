@@ -6,7 +6,7 @@ use regex::Regex;
 use std::str::FromStr;
 use std::sync::LazyLock;
 
-/// An absolute window of forward earth time with inclusive boundaries
+/// An absolute window of forward earth time, with inclusive boundaries
 #[derive(Debug, Clone)]
 pub struct Timeframe {
     begin: DateTime<Utc>,

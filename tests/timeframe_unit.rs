@@ -9,8 +9,8 @@ use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 
 #[test]
 fn accessors_behave() {
-    let start = Utc.timestamp_opt(1234567890, 321).unwrap();
-    let finish = Utc.timestamp_opt(9876543210, 123).unwrap();
+    let start = Utc.timestamp_opt(1_234_567_890, 321).unwrap();
+    let finish = Utc.timestamp_opt(9_876_543_210, 123).unwrap();
     let uut = Timeframe::new(start, finish).unwrap();
 
     assert_eq!(uut.begin(), start);
@@ -19,8 +19,8 @@ fn accessors_behave() {
 
 #[test]
 fn refuses_reverse_begin_end() {
-    let finish = Utc.timestamp_opt(1234567890, 321).unwrap();
-    let start = Utc.timestamp_opt(9876543210, 123).unwrap();
+    let finish = Utc.timestamp_opt(1_234_567_890, 321).unwrap();
+    let start = Utc.timestamp_opt(9_876_543_210, 123).unwrap();
     let uut = Timeframe::new(start, finish);
 
     assert!(uut.is_err_and(|e| e

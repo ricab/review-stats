@@ -32,6 +32,6 @@ fn main() {
     }
 
     if let Some(period) = args.period {
-        println!("Period: {}", period);
+        println!("Period: {period}");
     }
 }
