@@ -3,6 +3,7 @@ use crate::{BoxedError, Result};
 use chrono::{DateTime, TimeDelta, Utc};
 
 use regex::Regex;
+use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 use std::sync::LazyLock;
 
@@ -46,6 +47,12 @@ impl Timeframe {
 
     pub fn is_inside(&self, timestamp: DateTime<Utc>) -> bool {
         self.begin <= timestamp && timestamp <= self.end
+    }
+}
+
+impl Display for Timeframe {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "[{} .. {}]", self.begin, self.end)
     }
 }
 

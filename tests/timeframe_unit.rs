@@ -168,6 +168,17 @@ fn refuses_bad_numbers() {
     }
 }
 
+#[test]
+fn displays_as_inclusive_interval() {
+    let start = Utc.with_ymd_and_hms(2001, 02, 28, 2, 23, 31).unwrap();
+    let finish = Utc.with_ymd_and_hms(2001, 03, 02, 23, 32, 50).unwrap();
+    let uut = Timeframe::build(start, finish).unwrap();
+    assert_eq!(
+        uut.to_string(),
+        "[2001-02-28 02:23:31 UTC .. 2001-03-02 23:32:50 UTC]"
+    );
+}
+
 // Helpers
 
 fn assert_invalid_format_error(result: Result<Timeframe>) {
