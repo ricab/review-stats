@@ -1,4 +1,5 @@
 use clap::Parser;
+use review_stats::timeframe::Timeframe;
 
 #[derive(Parser)]
 #[command(
@@ -18,9 +19,9 @@ struct Args {
     #[arg(long, value_delimiter = ',')]
     reviewers: Option<Vec<String>>,
 
-    /// Time period to analyze (e.g., 10d, 2w, 3m, 24h)
+    /// Time period to analyze (e.g. 10d, 2w, 3m, 24h)
     #[arg(long)]
-    period: Option<String>,
+    period: Option<Timeframe>,
 }
 
 fn main() {
