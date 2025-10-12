@@ -17,7 +17,7 @@ pub struct Timeframe {
 impl Timeframe {
     pub const MONTH_DAYS: i64 = 30;
 
-    pub fn new(begin: DateTime<Utc>, end: DateTime<Utc>) -> Result<Self> {
+    pub fn build(begin: DateTime<Utc>, end: DateTime<Utc>) -> Result<Self> {
         if end < begin {
             Err("Timeframes must not end before they begin".into())
         } else {
