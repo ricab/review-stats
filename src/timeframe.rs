@@ -65,16 +65,16 @@ impl FromStr for Timeframe {
         let captures = re.captures(s).ok_or(emsg)?;
         let (value, unit) = (&captures[1], &captures[2]); // index 0 is the entire match
 
-        let creator: Result<fn(i64) -> TimeDelta> = match unit {
-            "h" => Ok(TimeDelta::hours),
-            "d" => Ok(TimeDelta::days),
-            "w" => Ok(TimeDelta::weeks),
-            "m" => Ok(|unit| TimeDelta::days(unit * Self::MONTH_DAYS)),
+        let creator: fn(i64) -> TimeDelta = match unit {
+            "h" => TimeDelta::hours,
+            "d" => TimeDelta::days,
+            "w" => TimeDelta::weeks,
+            "m" => |unit| TimeDelta::days(unit * Self::MONTH_DAYS),
             _ => unreachable!("Unknown unit '{}' shouldn't match regex", unit),
         };
 
         let num = value.parse()?;
-        let delta = creator?(num);
+        let delta = creator(num);
         if delta < TimeDelta::zero() {
             unreachable!("Negative value '{}' shouldn't match regex", num);
         }
