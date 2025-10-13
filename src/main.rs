@@ -1,5 +1,5 @@
 use clap::Parser;
-use review_stats::timeframe::Timeframe;
+use review_stats::{reviews::Stats, timeframe::Timeframe};
 
 #[derive(Parser)]
 #[command(
@@ -26,13 +26,7 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    println!("Repository: {}", args.repo);
 
-    if let Some(reviewers) = args.reviewers {
-        println!("Users: {}", reviewers.join(" "));
-    }
-
-    if let Some(period) = args.period {
-        println!("Period: {period}");
-    }
+    let stats = Stats::build(args.repo, args.reviewers, args.period);
+    println!("{stats:?}");
 }

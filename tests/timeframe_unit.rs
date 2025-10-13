@@ -1,6 +1,4 @@
-// Unit tests for Timeframe
-// Located here to prevent access to private fields
-// Enforce testing public interface only, to prevent brittleness
+// Unit tests for Timeframe. See README.md about the organization.
 
 use review_stats::{timeframe::Timeframe, Result};
 use std::fmt::Display;
