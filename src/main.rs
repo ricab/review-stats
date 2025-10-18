@@ -24,9 +24,10 @@ struct Args {
     period: Option<Timeframe>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Args::parse();
 
-    let stats = Stats::build(args.repo, args.reviewers, args.period);
+    let stats = Stats::build(args.repo, args.reviewers, args.period).await;
     println!("{stats:?}");
 }
