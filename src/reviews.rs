@@ -8,6 +8,8 @@ use tokio::pin;
 #[derive(Debug)]
 pub struct Stats;
 
+// TODO@ricab test...
+
 impl Stats {
     pub async fn build(repo: String, reviewers: Vec<String>, period: Timeframe) -> Result<Self> {
         println!("Repository: {}", repo);

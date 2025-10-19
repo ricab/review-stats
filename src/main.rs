@@ -1,5 +1,5 @@
 use clap::Parser;
-use review_stats::{reviews::Stats, timeframe::Timeframe};
+use review_stats::{repo_instance::RepoInstance, reviews::Stats, timeframe::Timeframe};
 
 #[derive(Parser)]
 #[command(
@@ -13,7 +13,7 @@ use review_stats::{reviews::Stats, timeframe::Timeframe};
 )]
 struct Args {
     /// GitHub repository in format owner/repo
-    repo: String,
+    repo: String, // TODO@ricab add custom type to parse repo into owner/repo struct
 
     /// Optional comma-separated reviewer usernames to filter for (e.g. alice,bob)
     /// [default: no filter]
