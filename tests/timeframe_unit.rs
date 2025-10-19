@@ -73,7 +73,7 @@ fn recognizes_timestamp_inside_outside() {
     {
         for (start, finish, other, expect_inside) in cases {
             let uut = Timeframe::build(converter(start), converter(finish)).unwrap();
-            assert_eq!(uut.is_inside(converter(other)), *expect_inside);
+            assert_eq!(uut.contains(converter(other)), *expect_inside);
         }
     }
 

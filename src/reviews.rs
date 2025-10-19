@@ -59,7 +59,7 @@ impl Stats {
                 .created_at
                 .expect("Pull request should have a timestamp"); // TODO@ricab why could this fail?
 
-            if period.is_inside(ts) {
+            if period.contains(ts) {
                 println!("Considering pull request #{} created at {ts}", pull.number); // TODO@ricab log
                 hit = true; // we've entered the period
                 pulls.push(pull);

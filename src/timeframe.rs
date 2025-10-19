@@ -45,7 +45,7 @@ impl Timeframe {
         self.end
     }
 
-    pub fn is_inside(&self, timestamp: DateTime<Utc>) -> bool {
+    pub fn contains(&self, timestamp: DateTime<Utc>) -> bool {
         self.begin <= timestamp && timestamp <= self.end
     }
 }
