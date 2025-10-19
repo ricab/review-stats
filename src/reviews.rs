@@ -1,5 +1,6 @@
 use crate::{timeframe::Timeframe, Result};
 use octocrab::params::pulls::Sort;
+use octocrab::params::Direction;
 
 /// Statistics on GitHub reviews
 #[derive(Debug)]
@@ -36,6 +37,7 @@ impl Stats {
             .sort(Sort::Created)
             .per_page(5)
             .page(1u32)
+            .direction(Direction::Descending)
             .send()
             .await
             .unwrap(); // TODO@ricab return result
