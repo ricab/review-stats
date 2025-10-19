@@ -15,16 +15,23 @@ struct Args {
     /// GitHub repository in format owner/repo
     repo: String,
 
-    /// Comma-separated reviewer usernames to count reviews for (e.g. alice,bob)
-    #[arg(long, value_delimiter = ',')]
-    reviewers: Option<Vec<String>>,
+    /// Optional comma-separated reviewer usernames to filter for (e.g. alice,bob)
+    /// [default: no filter]
+    #[arg(
+        long,
+        value_delimiter = ',',
+        default_value = Args::DEFAULT_REVIEWERS,
+        hide_default_value = true,
+    )]
+    reviewers: Vec<String>,
 
-    /// Time period to analyze (e.g. 10d, 2w, 3m, 24h)
+    /// Optional time period to analyze (e.g. 10d, 2w, 3m, 24h)
     #[arg(long, default_value = Self::DEFAULT_PERIOD)]
     period: Timeframe,
 }
 
 impl Args {
+    const DEFAULT_REVIEWERS: &'static str = "";
     const DEFAULT_PERIOD: &'static str = "15d";
 }
 

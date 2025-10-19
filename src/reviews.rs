@@ -9,16 +9,9 @@ use tokio::pin;
 pub struct Stats;
 
 impl Stats {
-    pub async fn build(
-        repo: String,
-        reviewers: Option<Vec<String>>,
-        period: Timeframe,
-    ) -> Result<Self> {
+    pub async fn build(repo: String, reviewers: Vec<String>, period: Timeframe) -> Result<Self> {
         println!("Repository: {}", repo);
-
-        if let Some(reviewers) = reviewers {
-            println!("Users: {}", reviewers.join(" "));
-        }
+        println!("Users: {}", reviewers.join(" "));
 
         Stats::fetch_pulls(period).await;
         Ok(Self {})
