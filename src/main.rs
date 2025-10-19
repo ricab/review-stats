@@ -20,8 +20,12 @@ struct Args {
     reviewers: Option<Vec<String>>,
 
     /// Time period to analyze (e.g. 10d, 2w, 3m, 24h)
-    #[arg(long)]
-    period: Option<Timeframe>,
+    #[arg(long, default_value = Self::DEFAULT_PERIOD)]
+    period: Timeframe,
+}
+
+impl Args {
+    const DEFAULT_PERIOD: &'static str = "15d";
 }
 
 #[tokio::main]

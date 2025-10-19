@@ -1,5 +1,4 @@
 use crate::{timeframe::Timeframe, Result};
-use chrono::TimeDelta; // TODO@ricab remove
 use futures_util::TryStreamExt;
 use octocrab::params::pulls::Sort;
 use octocrab::params::Direction;
@@ -13,22 +12,13 @@ impl Stats {
     pub async fn build(
         repo: String,
         reviewers: Option<Vec<String>>,
-        period: Option<Timeframe>,
+        period: Timeframe,
     ) -> Result<Self> {
         println!("Repository: {}", repo);
 
         if let Some(reviewers) = reviewers {
             println!("Users: {}", reviewers.join(" "));
         }
-
-        // TODO@ricab place default at clap level
-        // TODO@ricab no magic numbers
-        let days = 15;
-        let delta = TimeDelta::days(days);
-        let period = period.unwrap_or(
-            Timeframe::from_delta(delta)
-                .expect("A {days} days delta should result in a valid timeframe"),
-        );
 
         Stats::fetch_pulls(period).await;
         Ok(Self {})
