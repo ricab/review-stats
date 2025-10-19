@@ -38,12 +38,12 @@ impl Stats {
 
         while let Some(pull) = stream.try_next().await.unwrap() {
             // TODO@ricab return result
-            let ts = pull
-                .created_at
-                .expect("Pull request should have a timestamp"); // TODO@ricab why could this fail?
+            // TODO@ricab why could this fail?
+            let ts = pull.created_at.expect("Pull request should have a timestamp");
 
             if period.contains(ts) {
-                println!("Considering pull request #{} created at {ts}", pull.number); // TODO@ricab log
+                // TODO@ricab log
+                println!("Considering pull request #{} created at {ts}", pull.number);
                 hit = true; // we've entered the period
                 pulls.push(pull);
             } else if hit {

@@ -31,10 +31,7 @@ impl Timeframe {
             Err("Timeframes must not end before they begin".into())
         } else {
             let now = Utc::now();
-            Ok(Self {
-                begin: now - delta,
-                end: now,
-            })
+            Ok(Self { begin: now - delta, end: now })
         }
     }
 

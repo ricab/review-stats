@@ -21,8 +21,8 @@ fn refuses_reverse_begin_end() {
     let start = Utc.timestamp_opt(9_876_543_210, 123).unwrap();
     let uut = Timeframe::build(start, finish);
 
-    assert!(uut.is_err_and(|e| e
-        .to_string()
+    #[rustfmt::skip]
+    assert!(uut.is_err_and(|e| e.to_string()
         .contains("Timeframes must not end before they begin")));
 }
 
@@ -38,24 +38,9 @@ fn recognizes_timestamp_inside_outside() {
         (111, 222, 333, false),
     ];
     let cases2 = [
-        (
-            (2025, 9, 20, 23, 59, 59),
-            (2025, 9, 30, 0, 0, 0),
-            (2025, 9, 30, 12, 0, 0),
-            false,
-        ),
-        (
-            (2025, 9, 20, 23, 59, 59),
-            (2025, 9, 30, 0, 0, 0),
-            (2025, 9, 25, 12, 0, 0),
-            true,
-        ),
-        (
-            (2025, 9, 20, 23, 59, 59),
-            (2025, 9, 30, 0, 0, 0),
-            (2025, 9, 25, 1, 2, 3),
-            true,
-        ),
+        ((2025, 9, 20, 23, 59, 59), (2025, 9, 30, 0, 0, 0), (2025, 9, 30, 12, 0, 0), false),
+        ((2025, 9, 20, 23, 59, 59), (2025, 9, 30, 0, 0, 0), (2025, 9, 25, 12, 0, 0), true),
+        ((2025, 9, 20, 23, 59, 59), (2025, 9, 30, 0, 0, 0), (2025, 9, 25, 1, 2, 3), true),
     ];
 
     fn i_to_ts(i: &i64) -> DateTime<Utc> {
@@ -98,8 +83,8 @@ fn refuses_negative_timedelta() {
     let delta = TimeDelta::days(-123);
     let uut = Timeframe::from_delta(delta);
 
-    assert!(uut.is_err_and(|e| e
-        .to_string()
+    #[rustfmt::skip]
+    assert!(uut.is_err_and(|e| e.to_string()
         .contains("Timeframes must not end before they begin")));
 }
 
@@ -143,9 +128,8 @@ fn refuses_empty_string() {
 #[test]
 fn refuses_bad_units() {
     let nums = [0, 1, 21, 321, 4321];
-    let units = [
-        "", " ", "\t", "    ", " \t ", " d ", " up", "+", "=", "x", "9", "asdf", "hdw", "🤪",
-    ];
+    let units =
+        ["", " ", "\t", "    ", " \t ", " d ", " up", "+", "=", "x", "9", "asdf", "hdw", "🤪"];
 
     for num in nums {
         for unit in units {
@@ -171,18 +155,14 @@ fn displays_as_inclusive_interval() {
     let start = Utc.with_ymd_and_hms(2001, 02, 28, 2, 23, 31).unwrap();
     let finish = Utc.with_ymd_and_hms(2001, 03, 02, 23, 32, 50).unwrap();
     let uut = Timeframe::build(start, finish).unwrap();
-    assert_eq!(
-        uut.to_string(),
-        "[2001-02-28 02:23:31 UTC .. 2001-03-02 23:32:50 UTC]"
-    );
+    assert_eq!(uut.to_string(), "[2001-02-28 02:23:31 UTC .. 2001-03-02 23:32:50 UTC]");
 }
 
 // Helpers
 
 fn assert_invalid_format_error(result: Result<Timeframe>) {
-    assert!(result.is_err_and(|error| error
-        .to_string()
-        .to_lowercase()
+    #[rustfmt::skip]
+    assert!(result.is_err_and(|error| error.to_string().to_lowercase()
         .contains("invalid timeframe format")));
 }
 
