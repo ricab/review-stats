@@ -761,6 +761,7 @@ dependencies = [
  "chrono",
  "either",
  "futures",
+ "futures-core",
  "futures-util",
  "http",
  "http-body",
@@ -921,6 +922,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "clap",
+ "futures-util",
  "octocrab",
  "regex",
  "tokio",
