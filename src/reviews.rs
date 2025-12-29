@@ -1,4 +1,4 @@
-use crate::{timeframe::Timeframe, Result};
+use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
 use futures_util::TryStreamExt;
 use octocrab::params::pulls::Sort;
 use octocrab::params::Direction;
@@ -11,7 +11,7 @@ pub struct Stats;
 // TODO@ricab test...
 
 impl Stats {
-    pub async fn build(repo: String, reviewers: Vec<String>, period: Timeframe) -> Result<Self> {
+    pub async fn build(repo: RepoInstance, reviewers: Vec<String>, period: Timeframe) -> Result<Self> {
         println!("Repository: {}", repo);
         println!("Users: {}", reviewers.join(" "));
 

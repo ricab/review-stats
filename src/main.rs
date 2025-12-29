@@ -13,7 +13,7 @@ use review_stats::{repo_instance::RepoInstance, reviews::Stats, timeframe::Timef
 )]
 struct Args {
     /// GitHub repository in format owner/repo
-    repo: String, // TODO@ricab add custom type to parse repo into owner/repo struct
+    repo: RepoInstance, // TODO@ricab better name? (to distinguish from inner repo)
 
     /// Optional comma-separated reviewer usernames to filter for (e.g. alice,bob)
     /// [default: no filter]
