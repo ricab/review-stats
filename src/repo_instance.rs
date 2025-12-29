@@ -1,6 +1,7 @@
 use std::fmt::{Display, Formatter};
 use crate::{BoxedError, Result};
 
+#[derive(Debug, Clone)]
 pub struct RepoInstance {
     owner: String,
     repo: String,
