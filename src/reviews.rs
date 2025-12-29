@@ -11,20 +11,22 @@ pub struct Stats;
 // TODO@ricab test...
 
 impl Stats {
-    pub async fn build(repo: RepoInstance, reviewers: Vec<String>, period: Timeframe) -> Result<Self> {
+    pub async fn build(repo: RepoInstance,
+                       reviewers: Vec<String>,
+                       period: Timeframe) -> Result<Self> {
         println!("Repository: {}", repo);
         println!("Users: {}", reviewers.join(" "));
 
-        Stats::fetch_pulls(period).await;
+        Stats::fetch_pulls(repo, period).await;
         Ok(Self {})
     }
 }
 
 // private helpers
 impl Stats {
-    async fn fetch_pulls(period: Timeframe) {
+    async fn fetch_pulls(RepoInstance {owner, repo}: RepoInstance, period: Timeframe) {
         let octocrab = octocrab::instance();
-        let repo_pulls = octocrab.pulls("octocat", "hello-world"); // TODO@ricab parameterize repo
+        let repo_pulls = octocrab.pulls(owner, repo);
         let stream = repo_pulls
             .list()
             .sort(Sort::Created)

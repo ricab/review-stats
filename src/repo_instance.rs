@@ -3,8 +3,8 @@ use crate::{BoxedError, Result};
 
 #[derive(Debug, Clone)]
 pub struct RepoInstance {
-    owner: String,
-    repo: String,
+    pub owner: String,
+    pub repo: String,
 }
 
 // Custom public interface
