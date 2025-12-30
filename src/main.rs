@@ -13,7 +13,7 @@ use review_stats::{repo_instance::RepoInstance, reviews::Stats, timeframe::Timef
 )]
 struct Args {
     /// GitHub repository in format owner/repo
-    repo: RepoInstance, // TODO@ricab better name? (to distinguish from inner repo)
+    repository: RepoInstance,
 
     /// Optional comma-separated reviewer usernames to filter for (e.g. alice,bob)
     /// [default: no filter]
@@ -39,6 +39,6 @@ impl Args {
 async fn main() {
     let args = Args::parse();
 
-    let stats = Stats::build(args.repo, args.reviewers, args.period).await;
+    let stats = Stats::build(args.repository, args.reviewers, args.period).await;
     println!("{stats:?}");
 }
