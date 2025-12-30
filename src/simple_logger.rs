@@ -1,5 +1,5 @@
 use log::{Level, LevelFilter, Log, Metadata, Record};
-use std::io::Write;
+use std::io::{self, Write};
 
 pub struct SimpleLogger {
     level: LevelFilter,
@@ -11,6 +11,16 @@ impl SimpleLogger {
         log::set_max_level(level);
         log::set_logger(Box::leak(logger)).expect("Failed to set logger");
     }
+
+    fn target(&self, level: Level) -> Box<dyn Write> {
+        if level > self.level {
+            Box::new(io::sink())
+        } else if level <= Level::Warn {
+            Box::new(io::stderr())
+        } else {
+            Box::new(io::stdout())
+        }
+    }
 }
 
 impl Log for SimpleLogger {
@@ -19,17 +29,12 @@ impl Log for SimpleLogger {
     }
 
     fn log(&self, record: &Record) {
-        if self.enabled(record.metadata()) {
-            if record.level() <= Level::Warn {
-                eprintln!("{}: {}", record.level(), record.args());
-            } else {
-                println!("{}: {}", record.level(), record.args());
-            }
-        }
+        let mut target = self.target(record.level());
+        writeln!(target, "{}: {}", record.level(), record.args()).ok();
     }
 
     fn flush(&self) {
-        std::io::stdout().flush().ok();
-        std::io::stderr().flush().ok();
+        io::stdout().flush().ok();
+        io::stderr().flush().ok();
     }
 }
