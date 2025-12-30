@@ -1,5 +1,9 @@
 use clap::Parser;
-use review_stats::{repo_instance::RepoInstance, reviews::Stats, timeframe::Timeframe};
+use log::LevelFilter;
+use review_stats::{repo_instance::RepoInstance,
+                   reviews::Stats,
+                   simple_logger::SimpleLogger,
+                   timeframe::Timeframe};
 
 #[derive(Parser)]
 #[command(
@@ -28,6 +32,10 @@ struct Args {
     /// Optional time period to analyze (e.g. 10d, 2w, 3m, 24h)
     #[arg(long, default_value = Self::DEFAULT_PERIOD)]
     period: Timeframe,
+
+    /// Enable verbose output
+    #[arg(short, long)]
+    verbose: bool,
 }
 
 impl Args {
@@ -38,6 +46,7 @@ impl Args {
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
+    SimpleLogger::init(if args.verbose { LevelFilter::Debug } else { LevelFilter::Warn });
 
     let stats = Stats::build(args.repository, args.reviewers, args.period).await;
     println!("{stats:?}");

@@ -1,5 +1,6 @@
 pub mod repo_instance;
 pub mod reviews;
+pub mod simple_logger;
 pub mod timeframe;
 
 pub type BoxedError = Box<dyn std::error::Error + Send + Sync>;
