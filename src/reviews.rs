@@ -17,14 +17,14 @@ impl Stats {
         println!("Repository: {}", repo);
         println!("Users: {}", reviewers.join(" "));
 
-        Stats::fetch_pulls(repo, period).await;
+        Stats::fetch_pulls(repo, period).await?;
         Ok(Self {})
     }
 }
 
 // private helpers
 impl Stats {
-    async fn fetch_pulls(RepoInstance {owner, repo}: RepoInstance, period: Timeframe) {
+    async fn fetch_pulls(RepoInstance {owner, repo}: RepoInstance, period: Timeframe) -> Result<()> {
         let octocrab = octocrab::instance();
         let repo_pulls = octocrab.pulls(owner, repo);
         let stream = repo_pulls
@@ -32,17 +32,14 @@ impl Stats {
             .sort(Sort::Created)
             .direction(Direction::Descending)
             .send()
-            .await
-            .unwrap()
-            .into_stream(&octocrab); // TODO@ricab return result
+            .await?
+            .into_stream(&octocrab);
 
         pin!(stream);
         let mut hit = false;
         let mut pulls = Vec::new();
 
-        while let Some(pull) = stream.try_next().await.unwrap() {
-            // TODO@ricab return result
-            // TODO@ricab why could this fail?
+        while let Some(pull) = stream.try_next().await? {
             let ts = pull.created_at.expect("Pull request should have a timestamp");
 
             if period.contains(ts) {
@@ -55,6 +52,7 @@ impl Stats {
             }
         }
 
-        println!("Num pulls: {}", pulls.len())
+        println!("Num pulls: {}", pulls.len());
+        Ok(())
     }
 }
