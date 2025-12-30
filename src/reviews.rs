@@ -14,8 +14,8 @@ impl Stats {
     pub async fn build(repo: RepoInstance,
                        reviewers: Vec<String>,
                        period: Timeframe) -> Result<Self> {
-        println!("Repository: {}", repo);
-        println!("Users: {}", reviewers.join(" "));
+        log::debug!("Repository: {}", repo);
+        log::debug!("Users: {}", reviewers.join(" "));
 
         Stats::fetch_pulls(repo, period).await?;
         Ok(Self {})
@@ -47,12 +47,11 @@ impl Stats {
                 break; // we're now looking past the interesting period
             }
 
-            // TODO@ricab log
-            println!("Considering pull request #{} created at {ts}", pull.number);
+            log::debug!("Considering pull request #{} created at {ts}", pull.number);
             pulls.push(pull);
         }
 
-        println!("Num pulls: {}", pulls.len());
+        log::debug!("Looking for reviews on {} pull requests", pulls.len());
         Ok(())
     }
 }
