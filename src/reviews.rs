@@ -36,20 +36,20 @@ impl Stats {
             .into_stream(&octocrab);
 
         pin!(stream);
-        let mut hit = false;
         let mut pulls = Vec::new();
 
         while let Some(pull) = stream.try_next().await? {
             let ts = pull.created_at.expect("Pull request should have a timestamp");
 
-            if period.contains(ts) {
-                // TODO@ricab log
-                println!("Considering pull request #{} created at {ts}", pull.number);
-                hit = true; // we've entered the period
-                pulls.push(pull);
-            } else if hit {
-                break; // we're now looking past the period
+            // We'll consider any pull requests that weren't created after the interesting period.
+            // Those are the ones that could have gotten reviews in that period.
+            if ts > period.end() {
+                break; // we're now looking past the interesting period
             }
+
+            // TODO@ricab log
+            println!("Considering pull request #{} created at {ts}", pull.number);
+            pulls.push(pull);
         }
 
         println!("Num pulls: {}", pulls.len());
