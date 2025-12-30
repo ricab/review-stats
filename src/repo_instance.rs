@@ -37,6 +37,7 @@ impl std::str::FromStr for RepoInstance {
     }
 }
 
+// private helpers
 impl RepoInstance {
     fn ready_regex() -> &'static Regex {
         const OWNER_PATTERN: &str = r"[\w-]{1,39}";
