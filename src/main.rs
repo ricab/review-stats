@@ -11,9 +11,9 @@ use review_stats::{repo_instance::RepoInstance,
     about = "Count reviews on a GitHub repository",
     arg_required_else_help = true,
     after_help = "Examples:
-  count-reviews octocat/Hello-World
-  count-reviews --reviewers alice,bob microsoft/vscode
-  count-reviews --period 2w canonical/multipass"
+  review-stats octocat/Hello-World
+  review-stats --reviewers alice,bob microsoft/vscode
+  review-stats --period 2w canonical/multipass"
 )]
 struct Args {
     /// GitHub repository in format owner/repo
