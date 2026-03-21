@@ -1,5 +1,6 @@
 use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
 use futures_util::TryStreamExt;
+use octocrab::models::pulls::PullRequest;
 use octocrab::params::pulls::Sort;
 use octocrab::params::Direction;
 use tokio::pin;
@@ -17,14 +18,14 @@ impl Stats {
         log::debug!("Repository: {}", repo);
         log::debug!("Users: {}", reviewers.join(" "));
 
-        Stats::fetch_pulls(repo, period).await?;
+        let pulls = Stats::candidate_pulls(repo, period).await?;
         Ok(Self {})
     }
 }
 
 // private helpers
 impl Stats {
-    async fn fetch_pulls(RepoInstance {owner, repo}: RepoInstance, period: Timeframe) -> Result<()> {
+    async fn candidate_pulls(RepoInstance {owner, repo}: RepoInstance, period: Timeframe) -> Result<Vec<PullRequest>> {
         let octocrab = octocrab::instance();
         let repo_pulls = octocrab.pulls(owner, repo);
         let stream = repo_pulls
@@ -52,6 +53,6 @@ impl Stats {
         }
 
         log::debug!("Looking for reviews on {} pull requests", pulls.len());
-        Ok(())
+        Ok(pulls) // TODO@ricab this moves, right?
     }
 }
