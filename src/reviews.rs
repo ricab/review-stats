@@ -26,7 +26,7 @@ impl Stats {
         log::debug!("Users: {}", reviewers.join(" "));
 
         let octocrab = build_octocrab()?;
-        let pull_handler = octocrab.pulls(owner, repo);
+        let pull_handler = octocrab.pulls(owner.clone(), repo.clone());
         let stream = pull_handler
             .list()
             .state(All)
@@ -40,6 +40,18 @@ impl Stats {
 
         let pulls = Stats::candidate_pulls(stream, &period).await?;
         let review_counts = Stats::count_reviews(&octocrab, pull_handler, pulls, reviewers, &period).await?;
+
+        // /rate_limit is unreliable here (tends to lag significantly, unlike headers on
+        // billed requests), so pay one actual metered request to peek at the headers instead.
+        let rate_limit_response = octocrab._get(format!("https://api.github.com/repos/{owner}/{repo}")).await?;
+        let headers = rate_limit_response.headers();
+        let header = |name| headers.get(name).and_then(|v| v.to_str().ok()).unwrap_or("?");
+        log::debug!(
+            "GitHub API rate limit: {}/{} used ({} remaining)",
+            header("x-ratelimit-used"),
+            header("x-ratelimit-limit"),
+            header("x-ratelimit-remaining")
+        );
 
         Ok(Self { review_counts })
     }
