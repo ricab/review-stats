@@ -29,8 +29,8 @@ impl Stats {
         let pull_handler = octocrab.pulls(owner, repo);
         let stream = pull_handler
             .list()
-            .sort(Sort::Created)
             .state(All)
+            .sort(Sort::Updated)
             .direction(Direction::Descending)
             .send()
             .await?
@@ -52,15 +52,13 @@ impl Stats {
         let mut pulls = Vec::new();
 
         while let Some(pull) = pull_stream.try_next().await? {
-            let ts = pull.created_at.expect("Pull request should have a timestamp");
+            let ts = pull.updated_at.expect("Pull request should have an update timestamp");
 
-            // We'll consider any pull requests that weren't created after the interesting period.
-            // Those are the ones that could have gotten reviews in that period.
-            if ts > period.end() {
-                break; // we're now looking past the interesting period
+            if ts < period.begin() {
+                break; // this is too old - we're now past PRs updated within the period
             }
 
-            log::debug!("Considering pull request #{} as candidate (created at {ts})", pull.number);
+            log::debug!("Considering pull request #{} as candidate (updated at {ts})", pull.number);
             pulls.push(pull);
         }
 
