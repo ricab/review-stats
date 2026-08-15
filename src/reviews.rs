@@ -5,6 +5,7 @@ use octocrab::models::pulls::PullRequest;
 use octocrab::Octocrab;
 use octocrab::params::pulls::Sort;
 use octocrab::params::Direction;
+use octocrab::params::State::All;
 use octocrab::pulls::PullRequestHandler;
 use tokio::pin;
 
@@ -29,6 +30,7 @@ impl Stats {
         let stream = pull_handler
             .list()
             .sort(Sort::Created)
+            .state(All)
             .direction(Direction::Descending)
             .send()
             .await?
