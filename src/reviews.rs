@@ -75,10 +75,15 @@ impl Stats {
     ) -> Result<HashMap<String, u32>> {
         let mut counts: HashMap<String, u32> = HashMap::new();
         for pull in pulls {
+            log::debug!("Counting reviews on #{}", pull.number);
+
             let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(&octocrab);
             pin!(reviews);
+
             while let Some(review) = reviews.try_next().await? {
                 let review_ts = review.submitted_at.expect("Pull request should have a timestamp");
+                log::debug!("Review timestamp #{}: {}", pull.number, review_ts);
+
                 if period.contains(review_ts) {
                     let reviewer = review.user.expect("A review should have been made by someone").login;
                     if reviewers.is_empty() || reviewers.contains(&reviewer) {
