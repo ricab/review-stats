@@ -80,6 +80,7 @@ impl Stats {
         for pull in pulls {
             log::debug!("Counting reviews on #{}", pull.number);
 
+            let pr_author = pull.user.as_ref().expect("A pull request should have an author").login.as_ref();
             let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(octocrab);
             pin!(reviews);
 
@@ -89,7 +90,7 @@ impl Stats {
 
                 if period.contains(review_ts) {
                     let reviewer = review.user.expect("A review should have been made by someone").login;
-                    if reviewers.is_empty() || reviewers.contains(&reviewer) {
+                    if reviewer != pr_author && (reviewers.is_empty() || reviewers.contains(&reviewer)) {
                         *counts.entry(reviewer).or_insert(0) += 1;
                     }
                 }
