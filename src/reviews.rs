@@ -85,7 +85,7 @@ impl Stats {
             pin!(reviews);
 
             while let Some(review) = reviews.try_next().await? {
-                let review_ts = review.submitted_at.expect("Pull request should have a timestamp");
+                let review_ts = review.submitted_at.expect("Reviews should have a timestamp");
                 log::debug!("Review timestamp #{}: {}", pull.number, review_ts);
 
                 if period.contains(review_ts) {
