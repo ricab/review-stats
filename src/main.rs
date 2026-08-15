@@ -21,12 +21,7 @@ struct Args {
 
     /// Optional comma-separated reviewer usernames to filter for (e.g. alice,bob)
     /// [default: no filter]
-    #[arg(
-        long,
-        value_delimiter = ',',
-        default_value = Args::DEFAULT_REVIEWERS,
-        hide_default_value = true,
-    )]
+    #[arg(long, value_delimiter = ',')]
     reviewers: Vec<String>,
 
     /// Optional time period to analyze (e.g. 10d, 2w, 3m, 24h)
@@ -39,7 +34,6 @@ struct Args {
 }
 
 impl Args {
-    const DEFAULT_REVIEWERS: &'static str = "";
     const DEFAULT_PERIOD: &'static str = "15d";
 }
 
