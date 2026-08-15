@@ -24,7 +24,7 @@ impl Stats {
         log::debug!("Repository: {}", repo);
         log::debug!("Users: {}", reviewers.join(" "));
 
-        let octocrab = octocrab::instance();
+        let octocrab = build_octocrab()?;
         let pull_handler = octocrab.pulls(owner, repo);
         let stream = pull_handler
             .list()
@@ -66,7 +66,6 @@ impl Stats {
         Ok(pulls)
     }
 
-
     async fn count_reviews(
         octocrab: &Octocrab,
         pull_handler: PullRequestHandler<'_>,
@@ -91,4 +90,16 @@ impl Stats {
 
         Ok(counts)
     }
+}
+
+fn build_octocrab() -> Result<Octocrab> {
+    let mut builder = Octocrab::builder();
+
+    let token = std::env::var("GITHUB_TOKEN").unwrap_or_default();
+    if !token.is_empty() {
+        log::debug!("Authenticating with personal token from $GITHUB_TOKEN");
+        builder = builder.personal_token(token);
+    }
+
+    Ok(builder.build()?)
 }
