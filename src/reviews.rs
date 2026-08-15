@@ -16,7 +16,7 @@ pub struct Stats
     pub review_counts: HashMap<String, u32>
 }
 
-// TODO@ricab test...
+// TODO test...
 
 impl Stats {
     pub async fn build(RepoInstance {owner, repo}: RepoInstance,
@@ -91,6 +91,7 @@ impl Stats {
                 if period.contains(review_ts) {
                     let reviewer = review.user.expect("A review should have been made by someone").login;
                     if reviewer != pr_author && (reviewers.is_empty() || reviewers.contains(&reviewer)) {
+                        // TODO filter reviews where `state == COMMENTED && body == "" && comments.totalCount == 1 && comment.in_reply_to_id != null`
                         *counts.entry(reviewer).or_insert(0) += 1;
                     }
                 }
