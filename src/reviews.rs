@@ -77,7 +77,7 @@ impl Stats {
         for pull in pulls {
             log::debug!("Counting reviews on #{}", pull.number);
 
-            let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(&octocrab);
+            let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(octocrab);
             pin!(reviews);
 
             while let Some(review) = reviews.try_next().await? {
