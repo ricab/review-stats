@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
 use futures_util::{TryStream, TryStreamExt};
-use octocrab::models::pulls::PullRequest;
+use octocrab::models::pulls::{PullRequest, ReviewState};
 use octocrab::Octocrab;
 use octocrab::params::pulls::Sort;
 use octocrab::params::Direction;
@@ -85,7 +85,10 @@ impl Stats {
             pin!(reviews);
 
             while let Some(review) = reviews.try_next().await? {
-                let review_ts = review.submitted_at.expect("Reviews should have a timestamp");
+                let Some(review_ts) = review.submitted_at else {
+                    log::debug!("Skipping pending (unsubmitted) review on #{}", pull.number);
+                    continue;
+                };
                 log::debug!("Review timestamp #{}: {}", pull.number, review_ts);
 
                 if period.contains(review_ts) {
