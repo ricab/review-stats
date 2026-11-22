@@ -28,8 +28,7 @@ export GITHUB_TOKEN=$(gh auth token)
 ### Troubleshooting
 
 Run with `--verbose` (or `-v`) to enable debug logging.
-An unset or empty `GITHUB_TOKEN` silently falls back to anonymous access; debug logs show an
-"Authenticating with personal token" line when the token is picked up.
+Debug logs show an "Authenticating with personal token" line when the token is picked up.
 
 ## Build and test
 

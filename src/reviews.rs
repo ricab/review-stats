@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::env::VarError;
 use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
 use futures_util::{TryStream, TryStreamExt};
 use octocrab::models::pulls::{PullRequest, ReviewState};
@@ -108,10 +109,14 @@ impl Stats {
 fn build_octocrab() -> Result<Octocrab> {
     let mut builder = Octocrab::builder();
 
-    let token = std::env::var("GITHUB_TOKEN").unwrap_or_default();
-    if !token.is_empty() {
-        log::debug!("Authenticating with personal token from $GITHUB_TOKEN");
-        builder = builder.personal_token(token);
+    match std::env::var("GITHUB_TOKEN") {
+        Ok(token) if !token.is_empty() => {
+            log::debug!("Authenticating with personal token from $GITHUB_TOKEN");
+            builder = builder.personal_token(token);
+        }
+        Ok(_) | Err(VarError::NotPresent) =>
+            log::warn!("$GITHUB_TOKEN not set; using anonymous access (60 requests/hour)"),
+        Err(e) => return Err(format!("Invalid $GITHUB_TOKEN: {e}").into()),
     }
 
     Ok(builder.build()?)
