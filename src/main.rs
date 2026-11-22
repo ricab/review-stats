@@ -1,7 +1,7 @@
 use clap::Parser;
 use log::LevelFilter;
 use review_stats::{repo_instance::RepoInstance,
-                   reviews::Stats,
+                   reviews::Ledger,
                    simple_logger::SimpleLogger,
                    timeframe::Timeframe};
 
@@ -42,8 +42,8 @@ async fn main() -> review_stats::Result<()> {
     let args = Args::parse();
     SimpleLogger::init(if args.verbose { LevelFilter::Debug } else { LevelFilter::Warn });
 
-    let stats = Stats::build(args.repository, args.reviewers, args.period).await?;
-    for (reviewer, count) in stats.sorted_counts() {
+    let ledger = Ledger::build(args.repository, args.reviewers, args.period).await?;
+    for (reviewer, count) in ledger.sorted_counts() {
         println!("{reviewer}: {count}");
     }
 

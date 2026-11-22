@@ -12,20 +12,20 @@ use octocrab::params::State::All;
 use octocrab::pulls::PullRequestHandler;
 use tokio::pin;
 
-/// A review that counts towards the stats
+/// A submitted GitHub PR review
 #[derive(Debug)]
 pub struct ReviewRecord;
 
-/// Statistics on GitHub reviews
+/// A record of interesting reviews, grouped by reviewer
 #[derive(Debug)]
-pub struct Stats
+pub struct Ledger
 {
     pub reviews: HashMap<String, Vec<ReviewRecord>>
 }
 
 // TODO test...
 
-impl Stats {
+impl Ledger {
     pub async fn build(RepoInstance {owner, repo}: RepoInstance,
                        reviewers: Vec<String>,
                        period: Timeframe) -> Result<Self> {
@@ -45,8 +45,8 @@ impl Stats {
 
         pin!(stream);
 
-        let pulls = Stats::candidate_pulls(stream, &period).await?;
-        let reviews = Stats::collect_reviews(&octocrab, pull_handler, pulls, reviewers, &period).await?;
+        let pulls = Ledger::candidate_pulls(stream, &period).await?;
+        let reviews = Ledger::collect_reviews(&octocrab, pull_handler, pulls, reviewers, &period).await?;
 
         let (used, limit, remaining) = rate_allowance(&octocrab, &owner, &repo).await?;
         log::debug!("GitHub API rate limit: {used}/{limit} used ({remaining} remaining)");
@@ -65,7 +65,7 @@ impl Stats {
 }
 
 // private helpers
-impl Stats {
+impl Ledger {
     async fn candidate_pulls<S: TryStream<Ok=PullRequest, Error=octocrab::Error> + Unpin>(
         mut pull_stream: S, period: &Timeframe) -> Result<Vec<PullRequest>> {
         let mut pulls = Vec::new();
@@ -97,7 +97,7 @@ impl Stats {
             log::debug!("Counting reviews on #{}", pull.number);
 
             let pr_author = pull.user.as_ref().expect("A pull request should have an author").login.as_str();
-            let comments_by_review = Stats::comments_by_review(octocrab, &pull_handler, pull.number).await?;
+            let comments_by_review = Ledger::comments_by_review(octocrab, &pull_handler, pull.number).await?;
             let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(octocrab);
             pin!(reviews);
 
@@ -112,7 +112,7 @@ impl Stats {
                     let reviewer = &review.user.as_ref().expect("A review should have been made by someone").login;
                     if reviewer != pr_author
                         && (reviewers.is_empty() || reviewers.contains(reviewer))
-                        && !Stats::is_lone_reply(&review, &comments_by_review)
+                        && !Ledger::is_lone_reply(&review, &comments_by_review)
                     {
                         records.entry(reviewer.clone()).or_default().push(ReviewRecord);
                     }
