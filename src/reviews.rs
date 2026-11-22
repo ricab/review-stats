@@ -55,7 +55,7 @@ impl Stats {
         let mut counts: Vec<_> = self.review_counts.iter()
             .map(|(reviewer, &count)| (reviewer.as_str(), count))
             .collect();
-        counts.sort_by_key(|&(reviewer, count)| (Reverse(count), reviewer));
+        counts.sort_by_cached_key(|&(reviewer, count)| (Reverse(count), reviewer.to_lowercase()));
         counts
     }
 }

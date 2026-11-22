@@ -21,6 +21,12 @@ fn breaks_count_ties_by_name() {
 }
 
 #[test]
+fn breaks_count_ties_ignoring_case() {
+    let uut = stats_with(&[("bob", 2), ("Carol", 2), ("Alice", 2)]);
+    assert_eq!(uut.sorted_counts(), [("Alice", 2), ("bob", 2), ("Carol", 2)]);
+}
+
+#[test]
 fn sorts_no_counts() {
     let uut = stats_with(&[]);
     assert!(uut.sorted_counts().is_empty());
