@@ -1,10 +1,12 @@
 // Unit tests for reviews. See README.md about the organization.
 
-use review_stats::reviews::Stats;
+use review_stats::reviews::{ReviewRecord, Stats};
 
-fn stats_with(counts: &[(&str, u32)]) -> Stats {
+fn stats_with(counts: &[(&str, usize)]) -> Stats {
     Stats {
-        review_counts: counts.iter().map(|&(r, c)| (r.to_string(), c)).collect(),
+        reviews: counts.iter()
+            .map(|&(r, c)| (r.to_string(), (0..c).map(|_| ReviewRecord).collect()))
+            .collect(),
     }
 }
 

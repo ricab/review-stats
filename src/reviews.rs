@@ -12,11 +12,15 @@ use octocrab::params::State::All;
 use octocrab::pulls::PullRequestHandler;
 use tokio::pin;
 
+/// A review that counts towards the stats
+#[derive(Debug)]
+pub struct ReviewRecord;
+
 /// Statistics on GitHub reviews
 #[derive(Debug)]
 pub struct Stats
 {
-    pub review_counts: HashMap<String, u32>
+    pub reviews: HashMap<String, Vec<ReviewRecord>>
 }
 
 // TODO test...
@@ -42,18 +46,18 @@ impl Stats {
         pin!(stream);
 
         let pulls = Stats::candidate_pulls(stream, &period).await?;
-        let review_counts = Stats::count_reviews(&octocrab, pull_handler, pulls, reviewers, &period).await?;
+        let reviews = Stats::collect_reviews(&octocrab, pull_handler, pulls, reviewers, &period).await?;
 
         let (used, limit, remaining) = rate_allowance(&octocrab, &owner, &repo).await?;
         log::debug!("GitHub API rate limit: {used}/{limit} used ({remaining} remaining)");
 
-        Ok(Self { review_counts })
+        Ok(Self { reviews })
     }
 
     /// Review counts per reviewer, sorted in descending order, untieing by name
-    pub fn sorted_counts(&self) -> Vec<(&str, u32)> {
-        let mut counts: Vec<_> = self.review_counts.iter()
-            .map(|(reviewer, &count)| (reviewer.as_str(), count))
+    pub fn sorted_counts(&self) -> Vec<(&str, usize)> {
+        let mut counts: Vec<_> = self.reviews.iter()
+            .map(|(reviewer, records)| (reviewer.as_str(), records.len()))
             .collect();
         counts.sort_by_cached_key(|&(reviewer, count)| (Reverse(count), reviewer.to_lowercase()));
         counts
@@ -81,14 +85,14 @@ impl Stats {
         Ok(pulls)
     }
 
-    async fn count_reviews(
+    async fn collect_reviews(
         octocrab: &Octocrab,
         pull_handler: PullRequestHandler<'_>,
         pulls: Vec<PullRequest>,
         reviewers: Vec<String>,
         period: &Timeframe,
-    ) -> Result<HashMap<String, u32>> {
-        let mut counts: HashMap<String, u32> = HashMap::new();
+    ) -> Result<HashMap<String, Vec<ReviewRecord>>> {
+        let mut records: HashMap<String, Vec<ReviewRecord>> = HashMap::new();
         for pull in pulls {
             log::debug!("Counting reviews on #{}", pull.number);
 
@@ -110,13 +114,13 @@ impl Stats {
                         && (reviewers.is_empty() || reviewers.contains(reviewer))
                         && !Stats::is_lone_reply(&review, &comments_by_review)
                     {
-                        *counts.entry(reviewer.clone()).or_insert(0) += 1;
+                        records.entry(reviewer.clone()).or_default().push(ReviewRecord);
                     }
                 }
             }
         }
 
-        Ok(counts)
+        Ok(records)
     }
 
     /// Whether a review is just a single reply to an existing thread (GitHub wraps each such reply
