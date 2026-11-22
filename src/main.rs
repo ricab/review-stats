@@ -43,8 +43,8 @@ async fn main() -> review_stats::Result<()> {
     SimpleLogger::init(if args.verbose { LevelFilter::Debug } else { LevelFilter::Warn });
 
     let ledger = Ledger::build(args.repository, args.reviewers, args.period).await?;
-    for (reviewer, count) in ledger.sorted_counts() {
-        println!("{reviewer}: {count}");
+    for (reviewer, records) in ledger.sorted() {
+        println!("{reviewer}: {}", records.len());
     }
 
     Ok(())

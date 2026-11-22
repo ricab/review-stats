@@ -62,13 +62,13 @@ impl Ledger {
         Ok(Self { reviews })
     }
 
-    /// Review counts per reviewer, sorted in descending order, untieing by name
-    pub fn sorted_counts(&self) -> Vec<(&str, usize)> {
-        let mut counts: Vec<_> = self.reviews.iter()
-            .map(|(reviewer, records)| (reviewer.as_str(), records.len()))
+    /// Reviews per reviewer, sorted in descending order of count, untieing by name
+    pub fn sorted(&self) -> Vec<(&str, &[Record])> {
+        let mut sorted: Vec<_> = self.reviews.iter()
+            .map(|(reviewer, records)| (reviewer.as_str(), records.as_slice()))
             .collect();
-        counts.sort_by_cached_key(|&(reviewer, count)| (Reverse(count), reviewer.to_lowercase()));
-        counts
+        sorted.sort_by_cached_key(|&(reviewer, records)| (Reverse(records.len()), reviewer.to_lowercase()));
+        sorted
     }
 }
 
