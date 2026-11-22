@@ -43,7 +43,9 @@ async fn main() -> review_stats::Result<()> {
     SimpleLogger::init(if args.verbose { LevelFilter::Debug } else { LevelFilter::Warn });
 
     let stats = Stats::build(args.repository, args.reviewers, args.period).await?;
-    println!("{stats:?}");
+    for (reviewer, count) in &stats.review_counts {
+        println!("{reviewer}: {count}");
+    }
 
     Ok(())
 }
