@@ -4,44 +4,50 @@ use review_stats::{repo_instance::RepoInstance, Result};
 
 #[test]
 fn parses_valid_owner_repo() {
-    let uut: RepoInstance = "owner/repo".parse().unwrap();
-    assert_eq!(uut.owner, "owner");
-    assert_eq!(uut.repo, "repo");
+    let (owner, repo) = ("owner", "repo");
+    let uut: RepoInstance = format!("{owner}/{repo}").parse().unwrap();
+    assert_eq!(uut.owner, owner);
+    assert_eq!(uut.repo, repo);
 }
 
 #[test]
 fn parses_owner_repo_with_hyphens() {
-    let uut: RepoInstance = "my-owner/my-repo".parse().unwrap();
-    assert_eq!(uut.owner, "my-owner");
-    assert_eq!(uut.repo, "my-repo");
+    let (owner, repo) = ("my-owner", "my-repo");
+    let uut: RepoInstance = format!("{owner}/{repo}").parse().unwrap();
+    assert_eq!(uut.owner, owner);
+    assert_eq!(uut.repo, repo);
 }
 
 #[test]
 fn parses_owner_repo_with_underscores() {
-    let uut: RepoInstance = "my_owner/my_repo".parse().unwrap();
-    assert_eq!(uut.owner, "my_owner");
-    assert_eq!(uut.repo, "my_repo");
+    let (owner, repo) = ("my_owner", "my_repo");
+    let uut: RepoInstance = format!("{owner}/{repo}").parse().unwrap();
+    assert_eq!(uut.owner, owner);
+    assert_eq!(uut.repo, repo);
 }
 
 #[test]
 fn parses_repo_with_dots() {
-    let uut: RepoInstance = "owner/my.repo.name".parse().unwrap();
-    assert_eq!(uut.owner, "owner");
-    assert_eq!(uut.repo, "my.repo.name");
+    let (owner, repo) = ("owner", "my.repo.name");
+    let uut: RepoInstance = format!("{owner}/{repo}").parse().unwrap();
+    assert_eq!(uut.owner, owner);
+    assert_eq!(uut.repo, repo);
 }
 
 #[test]
 fn parses_numeric_names() {
-    let uut: RepoInstance = "123/456".parse().unwrap();
-    assert_eq!(uut.owner, "123");
-    assert_eq!(uut.repo, "456");
+    let (owner, repo) = ("123", "456");
+    let uut: RepoInstance = format!("{owner}/{repo}").parse().unwrap();
+    assert_eq!(uut.owner, owner);
+    assert_eq!(uut.repo, repo);
 }
 
 #[test]
 fn parses_mixed_case() {
-    let uut: RepoInstance = "OwnerName/RepoName".parse().unwrap();
-    assert_eq!(uut.owner, "OwnerName");
-    assert_eq!(uut.repo, "RepoName");
+    let (owner, repo) = ("OwnerName", "RepoName");
+    let uut: RepoInstance = format!("{owner}/{repo}").parse().unwrap();
+    assert_eq!(uut.owner, owner);
+    assert_eq!(uut.repo, repo);
 }
 
 #[test]
