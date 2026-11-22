@@ -83,7 +83,7 @@ impl FromStr for Timeframe {
 // private helpers
 impl Timeframe {
     fn ready_regex() -> &'static Regex {
-        static PATTERN: &'static str = r"^(\d+)([hdwm])$";
+        static PATTERN: &str = r"^(\d+)([hdwm])$";
         static REGEX: LazyLock<Regex> =
             LazyLock::new(|| Regex::new(PATTERN).expect("Pattern should be valid"));
         &REGEX
