@@ -2,10 +2,14 @@
 
 use review_stats::reviews::{Ledger, ReviewRecord};
 
+fn dummy_record() -> ReviewRecord {
+    ReviewRecord { url: String::new() }
+}
+
 fn ledger_with(counts: &[(&str, usize)]) -> Ledger {
     Ledger {
         reviews: counts.iter()
-            .map(|&(r, c)| (r.to_string(), (0..c).map(|_| ReviewRecord).collect()))
+            .map(|&(r, c)| (r.to_string(), (0..c).map(|_| dummy_record()).collect()))
             .collect(),
     }
 }

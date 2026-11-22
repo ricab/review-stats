@@ -14,7 +14,15 @@ use tokio::pin;
 
 /// A submitted GitHub PR review
 #[derive(Debug)]
-pub struct ReviewRecord;
+pub struct ReviewRecord {
+    pub url: String,
+}
+
+impl ReviewRecord {
+    fn from_github(review: &Review) -> Self {
+        Self { url: review.html_url.to_string() }
+    }
+}
 
 /// A record of interesting reviews, grouped by reviewer
 #[derive(Debug)]
@@ -114,7 +122,7 @@ impl Ledger {
                         && (reviewers.is_empty() || reviewers.contains(reviewer))
                         && !Ledger::is_lone_reply(&review, &comments_by_review)
                     {
-                        records.entry(reviewer.clone()).or_default().push(ReviewRecord);
+                        records.entry(reviewer.clone()).or_default().push(ReviewRecord::from_github(&review));
                     }
                 }
             }
