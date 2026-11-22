@@ -38,10 +38,12 @@ impl Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> review_stats::Result<()> {
     let args = Args::parse();
     SimpleLogger::init(if args.verbose { LevelFilter::Debug } else { LevelFilter::Warn });
 
-    let stats = Stats::build(args.repository, args.reviewers, args.period).await;
+    let stats = Stats::build(args.repository, args.reviewers, args.period).await?;
     println!("{stats:?}");
+
+    Ok(())
 }
