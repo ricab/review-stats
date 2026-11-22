@@ -1,3 +1,4 @@
+use std::cmp::Reverse;
 use std::collections::HashMap;
 use std::env::VarError;
 use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
@@ -47,6 +48,15 @@ impl Stats {
         log::debug!("GitHub API rate limit: {used}/{limit} used ({remaining} remaining)");
 
         Ok(Self { review_counts })
+    }
+
+    /// Review counts per reviewer, sorted in descending order, untieing by name
+    pub fn sorted_counts(&self) -> Vec<(&str, u32)> {
+        let mut counts: Vec<_> = self.review_counts.iter()
+            .map(|(reviewer, &count)| (reviewer.as_str(), count))
+            .collect();
+        counts.sort_by_key(|&(reviewer, count)| (Reverse(count), reviewer));
+        counts
     }
 }
 
