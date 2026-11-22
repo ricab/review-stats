@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::env::VarError;
 use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
 use futures_util::{TryStream, TryStreamExt};
-use octocrab::models::pulls::{Comment, PullRequest, ReviewState};
+use octocrab::models::pulls::{Comment, PullRequest, Review, ReviewState};
 use octocrab::models::ReviewId;
 use octocrab::Octocrab;
 use octocrab::params::pulls::Sort;
@@ -82,8 +82,8 @@ impl Stats {
         for pull in pulls {
             log::debug!("Counting reviews on #{}", pull.number);
 
-            let pr_author = pull.user.as_ref().expect("A pull request should have an author").login.as_ref();
-            let _comments_by_review = Stats::comments_by_review(octocrab, &pull_handler, pull.number).await?;
+            let pr_author = pull.user.as_ref().expect("A pull request should have an author").login.as_str();
+            let comments_by_review = Stats::comments_by_review(octocrab, &pull_handler, pull.number).await?;
             let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(octocrab);
             pin!(reviews);
 
@@ -95,16 +95,31 @@ impl Stats {
                 log::debug!("Review timestamp #{}: {}", pull.number, review_ts);
 
                 if period.contains(review_ts) {
-                    let reviewer = review.user.expect("A review should have been made by someone").login;
-                    if reviewer != pr_author && (reviewers.is_empty() || reviewers.contains(&reviewer)) {
-                        // TODO filter reviews where `state == COMMENTED && body == "" && comments.totalCount == 1 && comment.in_reply_to_id != null`
-                        *counts.entry(reviewer).or_insert(0) += 1;
+                    let reviewer = &review.user.as_ref().expect("A review should have been made by someone").login;
+                    if reviewer != pr_author
+                        && (reviewers.is_empty() || reviewers.contains(reviewer))
+                        && !Stats::is_lone_reply(&review, &comments_by_review)
+                    {
+                        *counts.entry(reviewer.clone()).or_insert(0) += 1;
                     }
                 }
             }
         }
 
         Ok(counts)
+    }
+
+    /// Whether a review is just a single reply to an existing thread (GitHub wraps each such reply
+    /// in its own bodyless COMMENTED review), rather than an actual review
+    fn is_lone_reply(review: &Review, comments_by_review: &HashMap<ReviewId, Vec<Comment>>) -> bool {
+        let bodyless_comment =
+            review.state == Some(ReviewState::Commented)
+            && review.body.as_deref().is_none_or(str::is_empty);
+
+        bodyless_comment && matches!(
+            comments_by_review.get(&review.id).map(Vec::as_slice),
+            Some([comment]) if comment.in_reply_to_id.is_some()
+        )
     }
 
     /// Fetch all inline review comments on a pull request, grouped by the review they belong to
