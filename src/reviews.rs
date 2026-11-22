@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::env::VarError;
 use crate::{timeframe::Timeframe, repo_instance::RepoInstance, Result};
 use futures_util::{TryStream, TryStreamExt};
-use octocrab::models::pulls::{PullRequest, ReviewState};
+use octocrab::models::pulls::{Comment, PullRequest, ReviewState};
+use octocrab::models::ReviewId;
 use octocrab::Octocrab;
 use octocrab::params::pulls::Sort;
 use octocrab::params::Direction;
@@ -82,6 +83,7 @@ impl Stats {
             log::debug!("Counting reviews on #{}", pull.number);
 
             let pr_author = pull.user.as_ref().expect("A pull request should have an author").login.as_ref();
+            let _comments_by_review = Stats::comments_by_review(octocrab, &pull_handler, pull.number).await?;
             let reviews = pull_handler.list_reviews(pull.number).send().await?.into_stream(octocrab);
             pin!(reviews);
 
@@ -103,6 +105,30 @@ impl Stats {
         }
 
         Ok(counts)
+    }
+
+    /// Fetch all inline review comments on a pull request, grouped by the review they belong to
+    async fn comments_by_review(
+        octocrab: &Octocrab,
+        pull_handler: &PullRequestHandler<'_>,
+        pull_number: u64,
+    ) -> Result<HashMap<ReviewId, Vec<Comment>>> {
+        let comments = pull_handler
+            .list_comments(Some(pull_number))
+            .per_page(100u8)
+            .send()
+            .await?
+            .into_stream(octocrab);
+        pin!(comments);
+
+        let mut by_review: HashMap<ReviewId, Vec<Comment>> = HashMap::new();
+        while let Some(comment) = comments.try_next().await? {
+            if let Some(review_id) = comment.pull_request_review_id {
+                by_review.entry(review_id).or_default().push(comment);
+            }
+        }
+
+        Ok(by_review)
     }
 }
 
