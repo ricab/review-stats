@@ -1,9 +1,9 @@
 // Unit tests for reviews. See README.md about the organization.
 
-use review_stats::reviews::{Ledger, ReviewRecord};
+use review_stats::reviews::{Ledger, Record};
 
-fn dummy_record() -> ReviewRecord {
-    ReviewRecord { url: String::new() }
+fn dummy_record() -> Record {
+    Record { url: String::new() }
 }
 
 fn ledger_with(counts: &[(&str, usize)]) -> Ledger {

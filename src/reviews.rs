@@ -14,11 +14,11 @@ use tokio::pin;
 
 /// A submitted GitHub PR review
 #[derive(Debug)]
-pub struct ReviewRecord {
+pub struct Record {
     pub url: String,
 }
 
-impl ReviewRecord {
+impl Record {
     fn from_github(review: &Review) -> Self {
         Self { url: review.html_url.to_string() }
     }
@@ -28,7 +28,7 @@ impl ReviewRecord {
 #[derive(Debug)]
 pub struct Ledger
 {
-    pub reviews: HashMap<String, Vec<ReviewRecord>>
+    pub reviews: HashMap<String, Vec<Record>>
 }
 
 // TODO test...
@@ -99,8 +99,8 @@ impl Ledger {
         pulls: Vec<PullRequest>,
         reviewers: Vec<String>,
         period: &Timeframe,
-    ) -> Result<HashMap<String, Vec<ReviewRecord>>> {
-        let mut records: HashMap<String, Vec<ReviewRecord>> = HashMap::new();
+    ) -> Result<HashMap<String, Vec<Record>>> {
+        let mut records: HashMap<String, Vec<Record>> = HashMap::new();
         for pull in pulls {
             log::debug!("Counting reviews on #{}", pull.number);
 
@@ -122,7 +122,7 @@ impl Ledger {
                         && (reviewers.is_empty() || reviewers.contains(reviewer))
                         && !Ledger::is_lone_reply(&review, &comments_by_review)
                     {
-                        records.entry(reviewer.clone()).or_default().push(ReviewRecord::from_github(&review));
+                        records.entry(reviewer.clone()).or_default().push(Record::from_github(&review));
                     }
                 }
             }
