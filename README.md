@@ -1,6 +1,6 @@
 # Review Stats
 
-Stats concerning PR reviews on GitHub.
+Stats concerning PR reviews (individual review submissions) on GitHub.
 
 ## Quickstart
 
