@@ -28,6 +28,10 @@ struct Args {
     #[arg(long, default_value = Self::DEFAULT_PERIOD)]
     period: Timeframe,
 
+    /// List each review under its reviewer
+    #[arg(long)]
+    list: bool,
+
     /// Enable verbose output
     #[arg(short, long)]
     verbose: bool,
@@ -45,6 +49,11 @@ async fn main() -> review_stats::Result<()> {
     let ledger = Ledger::build(args.repository, args.reviewers, args.period).await?;
     for (reviewer, records) in ledger.sorted() {
         println!("{reviewer}: {}", records.len());
+        if args.list {
+            for record in records {
+                println!("  {}", record.url);
+            }
+        }
     }
 
     Ok(())
